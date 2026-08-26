@@ -93,11 +93,11 @@ th{color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase
 .bar-track{flex:1; height:10px; background:var(--card2); border-radius:6px; overflow:hidden;}
 .bar-fill{height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2));}
 .bar-label{width:60px; color:var(--muted); flex-shrink:0;}
-.bar-val{width:80px; text-align:right; font-weight:700; flex-shrink:0;}
+.bar-val{width:70px; text-align:right; font-weight:700; flex-shrink:0;}
 
 /* ---------- Modal ---------- */
 .modal-overlay{position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:900; display:flex; align-items:center; justify-content:center; padding:16px;}
-.modal-box{background:var(--card); width:100%; max-width:480px; border-radius:16px; padding:20px; max-height:88vh; overflow-y:auto;}
+.modal-box{background:var(--card); width:100%; max-width:460px; border-radius:16px; padding:20px; max-height:88vh; overflow-y:auto;}
 .modal-title{font-size:16px; font-weight:800; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center;}
 .modal-close{background:var(--card2); border:none; color:var(--text); width:28px; height:28px; border-radius:50%;}
 .switch{position:relative; display:inline-block; width:42px; height:24px;}
@@ -180,15 +180,15 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
         <div class="grid">
           <div class="stat-box"><div class="stat-label">Total Users</div><div class="stat-value" id="statTotalUsers">0</div></div>
           <div class="stat-box"><div class="stat-label">Active Users (7d)</div><div class="stat-value accent" id="statActiveUsers">0</div></div>
-          <div class="stat-box"><div class="stat-label">Total Earnings Paid</div><div class="stat-value" id="statTotalEarnings">...</div></div>
-          <div class="stat-box"><div class="stat-label">Pending Withdraw</div><div class="stat-value warn" id="statPendingWithdraw">...</div></div>
-          <div class="stat-box"><div class="stat-label">Approved Withdraw</div><div class="stat-value accent" id="statApprovedWithdraw">...</div></div>
+          <div class="stat-box"><div class="stat-label">Total Earnings Paid</div><div class="stat-value" id="statTotalEarnings">৳0.00</div></div>
+          <div class="stat-box"><div class="stat-label">Pending Withdraw</div><div class="stat-value warn" id="statPendingWithdraw">৳0.00</div></div>
+          <div class="stat-box"><div class="stat-label">Approved Withdraw</div><div class="stat-value accent" id="statApprovedWithdraw">৳0.00</div></div>
           <div class="stat-box"><div class="stat-label">Tasks Completed</div><div class="stat-value" id="statTasksCompleted">0</div></div>
           <div class="stat-box"><div class="stat-label">Total Referrals</div><div class="stat-value" id="statTotalReferrals">0</div></div>
-          <div class="stat-box"><div class="stat-label">Referral Payouts</div><div class="stat-value" id="statReferralPayouts">...</div></div>
+          <div class="stat-box"><div class="stat-label">Referral Payouts</div><div class="stat-value" id="statReferralPayouts">৳0.00</div></div>
         </div>
 
-        <div class="section-title">Revenue / Activity Overview — last 7 days</div>
+        <div class="section-title">Revenue / Activity Overview — last 7 days (from real transaction ledger)</div>
         <div class="card" id="revenueChart"><div class="empty-row">Loading...</div></div>
 
         <div class="section-title">Recent Withdrawal Requests</div>
@@ -201,7 +201,7 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
       <!-- ================= USERS ================= -->
       <div id="admin-page-users" class="admin-page hidden">
         <div class="toolbar">
-          <input type="text" id="userSearchInput" placeholder="Search by name, email..." style="min-width:220px;" />
+          <input type="text" id="userSearchInput" placeholder="Search by name (prefix match)..." style="min-width:220px;" />
           <button class="btn secondary sm" onclick="searchUsers()">Search</button>
           <button class="btn secondary sm" onclick="clearUserSearch()">Clear</button>
         </div>
@@ -219,7 +219,7 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
         <div class="toolbar"><button class="btn" onclick="openTaskModal()">+ Create New Task</button></div>
         <div class="card table-wrap">
           <table>
-            <thead><tr><th>Title</th><th>Type</th><th>Reward</th><th>Cooldown/Days</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Title</th><th>Type</th><th>Reward</th><th>Cooldown</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody id="tasksTableBody"><tr><td colspan="6" class="empty-row">Loading...</td></tr></tbody>
           </table>
         </div>
@@ -247,8 +247,8 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
           <div class="toggle-row"><span>Enable Referral Bonus</span>
             <label class="switch"><input type="checkbox" id="referralEnabledToggle" onchange="saveReferralSettings()" /><span class="slider-tog"></span></label>
           </div>
-          <div class="field"><label>Referrer Bonus</label><input type="number" id="referrerBonusInput" step="0.01" min="0" /></div>
-          <div class="field"><label>Referred User Bonus</label><input type="number" id="referredBonusInput" step="0.01" min="0" /></div>
+          <div class="field"><label>Referrer Bonus (৳)</label><input type="number" id="referrerBonusInput" step="0.01" min="0" /></div>
+          <div class="field"><label>Referred User Bonus (৳)</label><input type="number" id="referredBonusInput" step="0.01" min="0" /></div>
           <button class="btn block" onclick="saveReferralSettings()">Save Referral Settings</button>
         </div>
         <div class="section-title">All Referrals</div>
@@ -264,10 +264,15 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
           <div class="section-title" style="margin-top:0;">Banner Ads</div>
           <div class="toggle-row"><span>Enable Banner Ads</span><label class="switch"><input type="checkbox" id="bannerEnabled" /><span class="slider-tog"></span></label></div>
           <div class="field"><label>Banner Ad Unit ID</label><input type="text" id="bannerAdUnitId" placeholder="e.g. ca-pub-xxxx/xxxx" /></div>
+          <div class="field">
+            <label>Custom Banner Embed Code (optional — paste your ad network's exact HTML/script snippet here to show a real ad; without it, the app just displays the Unit ID above as text)</label>
+            <textarea id="bannerCode" rows="4" placeholder="Paste your ad network's exact banner embed snippet here (script tag, ins tag, iframe — whatever they give you)"></textarea>
+          </div>
 
           <div class="section-title">Rewarded Video Ads</div>
           <div class="toggle-row"><span>Enable Rewarded Video</span><label class="switch"><input type="checkbox" id="rewardedEnabled" /><span class="slider-tog"></span></label></div>
           <div class="field"><label>Rewarded Ad Unit ID</label><input type="text" id="rewardedAdUnitId" /></div>
+          <div style="font-size:11px; color:var(--muted); margin-top:-6px;">Rewarded video ads need your network's JS SDK, not just a snippet — see the "window.OPULIX_showRewardedAd" integration point in the setup guide.</div>
 
           <div class="section-title">Interstitial Ads</div>
           <div class="toggle-row"><span>Enable Interstitial</span><label class="switch"><input type="checkbox" id="interstitialEnabled" /><span class="slider-tog"></span></label></div>
@@ -293,9 +298,11 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
             <input type="text" id="notifUserEmail" placeholder="user@example.com" />
           </div>
           <div class="field"><label>Message</label><textarea id="notifMessage" placeholder="Write your announcement..."></textarea></div>
-          <button class="btn block" onclick="sendNotification()">Send Notification</button>
+          <div class="field"><label>Schedule (optional — leave blank to send now)</label><input type="datetime-local" id="notifSchedule" /></div>
+          <button class="btn block" onclick="sendNotification()">Send / Schedule</button>
+          <div style="font-size:11px; color:var(--muted); margin-top:8px;">Scheduled announcements require the Cloud Function described in the setup guide to actually dispatch at the chosen time — without it they'll stay queued.</div>
         </div>
-        <div class="section-title">Sent Announcements</div>
+        <div class="section-title">Scheduled / Sent Announcements</div>
         <div class="card table-wrap">
           <table><thead><tr><th>Message</th><th>Target</th><th>Send Time</th><th>Status</th></tr></thead>
           <tbody id="scheduledTableBody"><tr><td colspan="4" class="empty-row">Loading...</td></tr></tbody></table>
@@ -312,7 +319,7 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
             <select id="setCurrency"><option value="BDT">BDT (৳)</option><option value="USD">USD ($)</option><option value="INR">INR (₹)</option></select>
           </div>
           <div class="toggle-row"><span>Maintenance Mode</span><label class="switch"><input type="checkbox" id="setMaintenanceMode" /><span class="slider-tog"></span></label></div>
-          <div style="font-size:11px; color:var(--muted); margin-top:6px;">When ON, non-admin users are signed out and shown a maintenance message.</div>
+          <div style="font-size:11px; color:var(--muted); margin-top:6px;">When ON, non-admin users are signed out of the app with a maintenance message on their next load.</div>
           <button class="btn block" type="submit">Save Settings</button>
         </form>
       </div>
@@ -335,13 +342,13 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
           <option value="facebook">Facebook Follow</option>
           <option value="telegram">Telegram Join</option>
           <option value="app-install">App Install</option>
+          <option value="daily-bonus">Daily Bonus</option>
         </select>
       </div>
-      <div class="field"><label>Reward Amount</label><input type="number" id="taskReward" min="0" step="0.01" required /></div>
-      <div class="field"><label>Cooldown (minutes, 0 = one-time)</label><input type="number" id="taskCooldown" min="0" step="1" required value="0"/></div>
-      <div class="field hidden" id="taskRequiredDaysField"><label>Required Engagement Days (for App Install)</label><input type="number" id="taskRequiredDays" min="1" step="1" value="14" /></div>
-      <div class="field"><label>Target Link (e.g., YouTube URL, Play Store Link)</label><input type="text" id="taskLink" placeholder="https://..." /></div>
-      <div class="field"><label>Description (optional, overrides default text)</label><textarea id="taskDescription"></textarea></div>
+      <div class="field"><label>Reward Amount (৳)</label><input type="number" id="taskReward" min="0" step="0.01" required /></div>
+      <div class="field"><label>Cooldown (minutes, 0 = one-time / no cooldown)</label><input type="number" id="taskCooldown" min="0" step="1" required /></div>
+      <div class="field"><label>Target Link (optional)</label><input type="text" id="taskLink" placeholder="https://..." /></div>
+      <div class="field"><label>Description</label><textarea id="taskDescription"></textarea></div>
       <div class="toggle-row"><span>Enabled</span><label class="switch"><input type="checkbox" id="taskEnabled" checked /><span class="slider-tog"></span></label></div>
       <button class="btn block" type="submit">Save Task</button>
     </form>
@@ -357,8 +364,8 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
       <div class="field"><label>Action</label>
         <select id="balanceAction"><option value="add">Add Balance</option><option value="deduct">Deduct Balance</option></select>
       </div>
-      <div class="field"><label>Amount</label><input type="number" id="balanceAmount" min="0.01" step="0.01" required /></div>
-      <div class="field"><label>Reason (visible to user)</label><input type="text" id="balanceReason" required placeholder="e.g. Manual bonus adjustment" /></div>
+      <div class="field"><label>Amount (৳)</label><input type="number" id="balanceAmount" min="0.01" step="0.01" required /></div>
+      <div class="field"><label>Reason (visible in user's transaction history)</label><input type="text" id="balanceReason" required placeholder="e.g. Manual bonus adjustment" /></div>
       <div class="error-text" id="balanceError"></div>
       <button class="btn block" type="submit">Confirm Adjustment</button>
     </form>
@@ -374,7 +381,7 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
 
 <script>
 /* =====================================================================================
-   FIREBASE CONFIG — use the SAME project/config as the user app
+   FIREBASE CONFIG — use the SAME project/config as the OPULIX user app (index.html)
 ===================================================================================== */
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
@@ -390,11 +397,11 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-let adminUser = null, unsubscribers = [], allUsersCache = {};
-let GLOBAL_SETTINGS = { currency: '৳' };
+let adminUser = null;
+let unsubscribers = [];
 
 /* =====================================================================================
-   UI HELPERS & FORMATTERS
+   UI HELPERS
 ===================================================================================== */
 function showToast(msg, type='info'){
   const wrap = document.getElementById('toastWrap');
@@ -405,33 +412,51 @@ function showLoading(show){ document.getElementById('loadingOverlay').classList.
 function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
 function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
 function escapeHtml(str){ const d=document.createElement('div'); d.textContent=str||''; return d.innerHTML; }
-function fmtMoney(n){ return GLOBAL_SETTINGS.currency + (n||0).toFixed(2); }
+const CURRENCY_SYMBOLS = { BDT:'৳', USD:'$', INR:'₹' };
+let CURRENT_CURRENCY = 'BDT'; // overwritten from settings/global before listeners start
+function fmtMoney(n){ return (CURRENCY_SYMBOLS[CURRENT_CURRENCY] || '৳') + (n||0).toFixed(2); }
 
 /* =====================================================================================
-   ADMIN AUTH & APP INITIALIZATION
+   ADMIN AUTH — only uids present in admins/{uid} may enter
 ===================================================================================== */
 async function handleAdminLogin(e){
   e.preventDefault();
-  const errEl = document.getElementById('adminLoginError'); errEl.style.display='none';
-  const email = document.getElementById('adminEmail').value.trim(), password = document.getElementById('adminPassword').value;
+  const errEl = document.getElementById('adminLoginError');
+  errEl.style.display='none';
+  const email = document.getElementById('adminEmail').value.trim();
+  const password = document.getElementById('adminPassword').value;
   showLoading(true);
   try{
     await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     await auth.signInWithEmailAndPassword(email, password);
+    // onAuthStateChanged handles the admin check + redirect
   }catch(err){
-    errEl.textContent = friendlyAuthError(err); errEl.style.display='block';
+    errEl.textContent = friendlyAuthError(err);
+    errEl.style.display='block';
   }
-  showLoading(false); return false;
+  showLoading(false);
+  return false;
 }
+
 function friendlyAuthError(err){
-  const map = { 'auth/invalid-email':'Please enter a valid email address.', 'auth/user-not-found':'No account found with this email.', 'auth/wrong-password':'Incorrect password.', 'auth/invalid-credential':'Incorrect email or password.', 'auth/too-many-requests':'Too many attempts. Please try again later.' };
-  return map[err.code] || (err.message || 'Login failed.');
+  const map = {
+    'auth/invalid-email':'Please enter a valid email address.',
+    'auth/user-not-found':'No account found with this email.',
+    'auth/wrong-password':'Incorrect password.',
+    'auth/invalid-credential':'Incorrect email or password.',
+    'auth/too-many-requests':'Too many attempts. Please try again later.'
+  };
+  return map[err.code] || (err.message || 'Login failed. Please try again.');
 }
-async function handleAdminLogout(){ detachAll(); await auth.signOut(); }
+
+async function handleAdminLogout(){
+  detachAll();
+  await auth.signOut();
+}
 
 auth.onAuthStateChanged(async (user)=>{
   if(!user){
-    adminUser = null; detachAll();
+    adminUser = null;
     document.getElementById('adminShell').classList.add('hidden');
     document.getElementById('adminLoginScreen').classList.remove('hidden');
     return;
@@ -440,26 +465,27 @@ auth.onAuthStateChanged(async (user)=>{
   try{
     const adminDoc = await db.collection('admins').doc(user.uid).get();
     if(!adminDoc.exists){
+      showLoading(false);
       showToast('This account is not authorized for admin access.','error');
-      await auth.signOut(); return;
+      await auth.signOut();
+      return;
     }
     adminUser = user;
     document.getElementById('adminLoginScreen').classList.add('hidden');
     document.getElementById('adminShell').classList.remove('hidden');
     document.getElementById('adminEmailDisplay').textContent = user.email;
-    initializeAppState();
+    try{
+      const settingsDoc = await db.collection('settings').doc('global').get();
+      if(settingsDoc.exists && settingsDoc.data().currency) CURRENT_CURRENCY = settingsDoc.data().currency;
+    }catch(err){ /* fall back to BDT default if this fails */ }
+    initAllListeners();
   }catch(err){
-    showToast('Failed to verify admin access.','error'); await auth.signOut();
-  } finally {
-    showLoading(false);
+    showToast('Failed to verify admin access.','error');
+    await auth.signOut();
   }
+  showLoading(false);
 });
 
-async function initializeAppState() {
-    await loadGlobalSettings(); // Load currency and other settings first
-    initAllListeners();         // Then initialize all data listeners
-    populateSettingsPage();     // Then populate the settings page form fields
-}
 function detachAll(){ unsubscribers.forEach(u=>u()); unsubscribers = []; }
 
 /* =====================================================================================
@@ -475,70 +501,101 @@ function goAdminPage(page){
 }
 
 /* =====================================================================================
-   INIT ALL REALTIME LISTENERS
+   INIT ALL REALTIME LISTENERS (after admin verified)
 ===================================================================================== */
+let allUsersCache = {}; // uid -> user data, built from the dashboard/users listeners
 function initAllListeners(){
-  listenDashboardStats(); listenUsersPage(); listenTasksPage(); listenWithdrawPage();
-  listenReferralPage(); loadAdsConfig(); listenScheduledNotifications();
+  listenDashboardStats();
+  listenUsersPage();
+  listenTasksPage();
+  listenWithdrawPage();
+  listenReferralPage();
+  loadAdsConfig();
+  loadGlobalSettings();
+  listenScheduledNotifications();
 }
 
 /* =====================================================================================
    DASHBOARD
 ===================================================================================== */
 function listenDashboardStats(){
-  unsubscribers.push(db.collection('users').onSnapshot((snap)=>{
+  const uUnsub = db.collection('users').onSnapshot((snap)=>{
     let total=0, active=0, earnings=0, pendingW=0, approvedW=0;
-    const weekAgo = Date.now() - 7*24*60*60*1000;
-    allUsersCache = {};
+    const now = Date.now();
     snap.forEach(doc=>{
-      const d = doc.data(); allUsersCache[doc.id] = d; total++;
-      earnings += d.totalEarnings||0; pendingW += d.pendingWithdraw||0; approvedW += d.totalWithdrawn||0;
-      const lastLogin = d.lastCheckin ? d.lastCheckin.toMillis() : (d.createdAt ? d.createdAt.toMillis() : 0);
-      if(lastLogin > weekAgo) active++;
+      const d = doc.data();
+      allUsersCache[doc.id] = d;
+      total++;
+      earnings += d.totalEarnings||0;
+      pendingW += d.pendingWithdraw||0;
+      approvedW += d.totalWithdrawn||0;
+      const last = d.lastCheckin ? d.lastCheckin.toMillis() : (d.createdAt ? d.createdAt.toMillis() : 0);
+      if(now - last < 7*24*60*60*1000) active++;
     });
     document.getElementById('statTotalUsers').textContent = total;
     document.getElementById('statActiveUsers').textContent = active;
     document.getElementById('statTotalEarnings').textContent = fmtMoney(earnings);
     document.getElementById('statPendingWithdraw').textContent = fmtMoney(pendingW);
     document.getElementById('statApprovedWithdraw').textContent = fmtMoney(approvedW);
-  }));
-  unsubscribers.push(db.collection('completedTasks').onSnapshot(s=>document.getElementById('statTasksCompleted').textContent = s.size));
-  unsubscribers.push(db.collection('referrals').onSnapshot(s=>{
-    let payouts = 0; s.forEach(doc=>{ payouts += doc.data().referrerBonus || 0; });
-    document.getElementById('statTotalReferrals').textContent = s.size;
+  }, err=>console.error(err));
+  unsubscribers.push(uUnsub);
+
+  const ctUnsub = db.collection('completedTasks').onSnapshot((snap)=>{
+    document.getElementById('statTasksCompleted').textContent = snap.size;
+  });
+  unsubscribers.push(ctUnsub);
+
+  const refUnsub = db.collection('referrals').onSnapshot((snap)=>{
+    let payouts = 0;
+    snap.forEach(doc=>{ payouts += doc.data().referrerBonus || 0; });
+    document.getElementById('statTotalReferrals').textContent = snap.size;
     document.getElementById('statReferralPayouts').textContent = fmtMoney(payouts);
-  }));
-  unsubscribers.push(db.collection('withdrawRequests').orderBy('createdAt','desc').limit(8).onSnapshot(s=>{
+  });
+  unsubscribers.push(refUnsub);
+
+  const wdUnsub = db.collection('withdrawRequests').orderBy('createdAt','desc').limit(8).onSnapshot((snap)=>{
     const body = document.getElementById('dashRecentWithdrawals');
-    if(s.empty){ body.innerHTML = '<tr><td colspan="4" class="empty-row">No withdrawal requests</td></tr>'; return; }
+    if(snap.empty){ body.innerHTML = '<tr><td colspan="4" class="empty-row">No withdrawal requests yet</td></tr>'; return; }
     let html = '';
-    s.forEach(doc=>{
+    snap.forEach(doc=>{
       const w = doc.data();
-      const u = allUsersCache[w.uid];
-      html += `<tr><td>${escapeHtml((u?u.name:null)||w.uid.slice(0,10)+'...')}</td><td>${w.method}</td><td>${fmtMoney(w.amount)}</td><td><span class="pill ${w.status}">${w.status}</span></td></tr>`;
+      html += `<tr><td>${escapeHtml(w.uid).slice(0,10)}...</td><td>${w.method}</td><td>${fmtMoney(w.amount)}</td><td><span class="pill ${w.status}">${w.status}</span></td></tr>`;
     });
     body.innerHTML = html;
-  }));
-  unsubscribers.push(db.collection('transactions').orderBy('createdAt','desc').limit(300).onSnapshot(renderRevenueChart));
+  });
+  unsubscribers.push(wdUnsub);
+
+  const txUnsub = db.collection('transactions').orderBy('createdAt','desc').limit(300).onSnapshot((snap)=>{
+    renderRevenueChart(snap);
+  });
+  unsubscribers.push(txUnsub);
 }
 
 function renderRevenueChart(snap){
-  const days = {}; const labels = [];
+  const days = {};
+  const labels = [];
   for(let i=6;i>=0;i--){
-    const d = new Date(Date.now() - i*86400000); const key = d.toISOString().slice(0,10);
-    days[key] = { credit:0, debit:0 }; labels.push(key);
+    const d = new Date(Date.now() - i*86400000);
+    const key = d.toISOString().slice(0,10);
+    days[key] = { credit:0, debit:0 };
+    labels.push(key);
   }
   snap.forEach(doc=>{
-    const t = doc.data(); if(!t.createdAt) return;
+    const t = doc.data();
+    if(!t.createdAt) return;
     const key = t.createdAt.toDate().toISOString().slice(0,10);
-    if(days[key]){ if(t.type==='credit') days[key].credit += t.amount; else days[key].debit += t.amount; }
+    if(days[key]){
+      if(t.type==='credit') days[key].credit += t.amount;
+      else days[key].debit += t.amount;
+    }
   });
-  const maxVal = Math.max(1, ...Object.values(days).map(d=>Math.max(d.credit, d.debit)));
+  const maxVal = Math.max(1, ...labels.map(k=>Math.max(days[k].credit, days[k].debit)));
   let html = '';
   labels.forEach(key=>{
-    const c = days[key].credit, dbt = days[key].debit; const label = key.slice(5);
-    html += `<div class="bar-row"><span class="bar-label">${label}</span><div class="bar-track"><div class="bar-fill" style="width:${(c/maxVal*100).toFixed(1)}%"></div></div><span class="bar-val">+${fmtMoney(c)}</span></div>
-             <div class="bar-row"><span class="bar-label"></span><div class="bar-track"><div class="bar-fill" style="width:${(dbt/maxVal*100).toFixed(1)}%; background:linear-gradient(90deg,var(--danger),var(--warn));"></div></div><span class="bar-val">-${fmtMoney(dbt)}</span></div>`;
+    const c = days[key].credit, dbt = days[key].debit;
+    const label = key.slice(5);
+    html += `<div class="bar-row"><span class="bar-label">${label}</span><div class="bar-track"><div class="bar-fill" style="width:${(c/maxVal*100).toFixed(1)}%"></div></div><span class="bar-val">+${fmtMoney(c)}</span></div>`;
+    html += `<div class="bar-row"><span class="bar-label"></span><div class="bar-track"><div class="bar-fill" style="width:${(dbt/maxVal*100).toFixed(1)}%; background:linear-gradient(90deg,var(--danger),var(--warn));"></div></div><span class="bar-val">-${fmtMoney(dbt)}</span></div>`;
   });
   document.getElementById('revenueChart').innerHTML = html || '<div class="empty-row">No transactions yet</div>';
 }
@@ -546,9 +603,13 @@ function renderRevenueChart(snap){
 /* =====================================================================================
    USER MANAGEMENT
 ===================================================================================== */
-let usersLastDoc = null, usersSearchMode = false;
+let usersLastDoc = null;
+let usersSearchMode = false;
 
-function listenUsersPage(){ loadUsersPage(true); }
+function listenUsersPage(){
+  loadUsersPage(true);
+}
+
 async function loadUsersPage(reset){
   if(reset){ usersLastDoc = null; document.getElementById('usersTableBody').innerHTML = ''; }
   let q = db.collection('users').orderBy('createdAt','desc').limit(25);
@@ -564,13 +625,16 @@ function loadMoreUsers(){ loadUsersPage(false); }
 function appendUserRow(uid, d){
   const body = document.getElementById('usersTableBody');
   const avatar = d.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(d.name||'U')}`;
+  const joined = d.createdAt ? d.createdAt.toDate().toLocaleDateString() : '—';
   const banned = d.banned === true;
-  const row = document.createElement('tr'); row.id = 'user-row-'+uid;
+  const row = document.createElement('tr');
+  row.id = 'user-row-'+uid;
   row.innerHTML = `
     <td><img class="mini-avatar" src="${avatar}"/>${escapeHtml(d.name||'—')}<br><span style="color:var(--muted); font-size:11px;">${escapeHtml(d.email||'')}</span></td>
-    <td>${fmtMoney(d.balance)}</td><td>${fmtMoney(d.totalEarnings)}</td>
+    <td>${fmtMoney(d.balance)}</td>
+    <td>${fmtMoney(d.totalEarnings)}</td>
     <td><span class="pill ${banned?'banned':'active'}">${banned?'Banned':'Active'}</span></td>
-    <td>${d.createdAt ? d.createdAt.toDate().toLocaleDateString() : '—'}</td>
+    <td>${joined}</td>
     <td style="white-space:nowrap;">
       <button class="btn sm secondary" onclick="viewUserDetail('${uid}')">View</button>
       <button class="btn sm secondary" onclick="openBalanceModal('${uid}','${escapeHtml(d.name||'')}')">Balance</button>
@@ -583,114 +647,180 @@ async function toggleBan(uid, newStatus){
   showLoading(true);
   try{
     await db.collection('users').doc(uid).update({ banned: newStatus });
-    await addNotification(uid, newStatus ? 'Your account has been suspended.' : 'Your account has been reinstated.');
+    await addNotification(uid, newStatus ? 'Your account has been suspended by an administrator.' : 'Your account has been reinstated.');
     showToast(newStatus ? 'User banned.' : 'User unbanned.', 'success');
     const badgeCell = document.querySelector(`#user-row-${uid} .pill`);
-    if(badgeCell){ badgeCell.textContent = newStatus?'Banned':'Active'; badgeCell.className = 'pill '+(newStatus?'banned':'active'); }
+    if(badgeCell){ badgeCell.textContent = newStatus?'Banned':'Active'; badgeCell.className = 'pill ' + (newStatus?'banned':'active'); }
     const btn = document.querySelector(`#user-row-${uid} .btn.danger, #user-row-${uid} .btn.ok`);
-    if(btn){ btn.textContent = newStatus?'Unban':'Ban'; btn.className = 'btn sm '+(newStatus?'ok':'danger'); btn.onclick = ()=>toggleBan(uid, !newStatus); }
+    if(btn){ btn.textContent = newStatus?'Unban':'Ban'; btn.className = 'btn sm ' + (newStatus?'ok':'danger'); btn.setAttribute('onclick', `toggleBan('${uid}', ${!newStatus})`); }
   }catch(err){ showToast('Failed to update ban status.','error'); }
   showLoading(false);
 }
 
 async function searchUsers(){
-  // This is a basic prefix search. For full-text search, use a third-party service like Algolia.
-  const term = document.getElementById('userSearchInput').value.trim(); if(!term) return;
-  usersSearchMode = true; document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="6" class="empty-row">Searching...</td></tr>';
+  const term = document.getElementById('userSearchInput').value.trim();
+  if(!term){ return; }
+  usersSearchMode = true;
+  document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="6" class="empty-row">Searching...</td></tr>';
   document.getElementById('loadMoreUsersBtn').style.display = 'none';
   try{
-    const nameQuery = db.collection('users').orderBy('name').startAt(term).endAt(term+'\uf8ff').limit(15).get();
-    const emailQuery = db.collection('users').orderBy('email').startAt(term).endAt(term+'\uf8ff').limit(15).get();
-    const [nameSnap, emailSnap] = await Promise.all([nameQuery, emailQuery]);
+    const snap = await db.collection('users').orderBy('name').startAt(term).endAt(term+'\uf8ff').limit(25).get();
     document.getElementById('usersTableBody').innerHTML = '';
-    const results = new Map();
-    nameSnap.forEach(doc => results.set(doc.id, doc.data()));
-    emailSnap.forEach(doc => results.set(doc.id, doc.data()));
-    if(results.size === 0){ document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="6" class="empty-row">No matching users found</td></tr>'; return; }
-    results.forEach((data, id) => appendUserRow(id, data));
-  }catch(err){ showToast('Search failed.','error'); console.error(err); }
+    if(snap.empty){ document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="6" class="empty-row">No matching users (name is case-sensitive prefix match)</td></tr>'; return; }
+    snap.forEach(doc=> appendUserRow(doc.id, doc.data()));
+  }catch(err){ showToast('Search failed.','error'); }
 }
 function clearUserSearch(){
-  usersSearchMode = false; document.getElementById('userSearchInput').value = '';
-  loadUsersPage(true); document.getElementById('loadMoreUsersBtn').style.display = 'inline-block';
+  usersSearchMode = false;
+  document.getElementById('userSearchInput').value = '';
+  loadUsersPage(true);
+  document.getElementById('loadMoreUsersBtn').style.display = 'inline-block';
+}
+
+function openBalanceModal(uid, name){
+  document.getElementById('balanceUserId').value = uid;
+  document.getElementById('balanceUserLabel').textContent = 'Adjusting balance for: ' + name;
+  document.getElementById('balanceAmount').value = '';
+  document.getElementById('balanceReason').value = '';
+  document.getElementById('balanceError').style.display = 'none';
+  openModal('balanceModal');
+}
+
+async function submitBalanceAdjust(e){
+  e.preventDefault();
+  const uid = document.getElementById('balanceUserId').value;
+  const action = document.getElementById('balanceAction').value;
+  const amount = parseFloat(document.getElementById('balanceAmount').value);
+  const reason = document.getElementById('balanceReason').value.trim();
+  const errEl = document.getElementById('balanceError');
+  errEl.style.display = 'none';
+  if(isNaN(amount) || amount <= 0){ errEl.textContent='Enter a valid amount.'; errEl.style.display='block'; return false; }
+
+  showLoading(true);
+  try{
+    const delta = action === 'add' ? amount : -amount;
+    const userRef = db.collection('users').doc(uid);
+    await db.runTransaction(async (tx)=>{
+      const snap = await tx.get(userRef);
+      const bal = snap.data().balance || 0;
+      if(action === 'deduct' && bal < amount) throw new Error('INSUFFICIENT');
+      const update = { balance: firebase.firestore.FieldValue.increment(delta) };
+      if(action === 'add') update.totalEarnings = firebase.firestore.FieldValue.increment(amount);
+      tx.update(userRef, update);
+    });
+    await addTransaction(uid, `Admin adjustment: ${reason}`, amount, action==='add'?'credit':'debit');
+    await addNotification(uid, `An admin ${action==='add'?'added':'deducted'} ${fmtMoney(amount)} to/from your balance. Reason: ${reason}`);
+    showToast('Balance updated.','success');
+    closeModal('balanceModal');
+  }catch(err){
+    if(err.message === 'INSUFFICIENT'){ errEl.textContent = 'User balance is lower than the deduction amount.'; errEl.style.display='block'; }
+    else { showToast('Failed to adjust balance.','error'); }
+  }
+  showLoading(false);
+  return false;
 }
 
 async function viewUserDetail(uid){
   showLoading(true);
   try{
-    const [userDoc, txSnap, completedSnap, referralSnap] = await Promise.all([
-        db.collection('users').doc(uid).get(),
-        db.collection('transactions').where('uid','==',uid).orderBy('createdAt','desc').limit(15).get(),
-        db.collection('completedTasks').where('uid','==',uid).get(),
-        db.collection('referrals').where('referrerUid','==',uid).get()
+    const userDoc = await db.collection('users').doc(uid).get();
+    const d = userDoc.data();
+    const [txSnap, completedSnap] = await Promise.all([
+      db.collection('transactions').where('uid','==',uid).orderBy('createdAt','desc').limit(15).get(),
+      db.collection('completedTasks').where('uid','==',uid).get() // equality-only filter, no composite index needed
     ]);
     let txHtml = '<div class="empty-row">No transactions</div>';
     if(!txSnap.empty){
       txHtml = '<table><thead><tr><th>Label</th><th>Amount</th><th>Date</th></tr></thead><tbody>';
       txSnap.forEach(doc=>{
-        const t = doc.data(), cls = t.type==='credit'?'ok':'danger';
-        txHtml += `<tr><td>${escapeHtml(t.label)}</td><td style="color:var(--${cls})">${t.type==='credit'?'+':'-'}${fmtMoney(t.amount)}</td><td>${t.createdAt?t.createdAt.toDate().toLocaleString():''}</td></tr>`;
+        const t = doc.data();
+        const cls = t.type==='credit' ? 'style="color:var(--ok)"' : 'style="color:var(--danger)"';
+        txHtml += `<tr><td>${escapeHtml(t.label)}</td><td ${cls}>${t.type==='credit'?'+':'-'}${fmtMoney(t.amount)}</td><td>${t.createdAt?t.createdAt.toDate().toLocaleString():''}</td></tr>`;
       });
       txHtml += '</tbody></table>';
     }
-    const d = userDoc.data();
+    // Count only genuinely completed items: one-time/repeatable tasks always count once they
+    // exist here; app-install only counts once its 14-day streak reaches status "completed".
+    let completedCount = 0;
+    completedSnap.forEach(doc=>{
+      const c = doc.data();
+      if(c.status === 'in-progress') return; // app-install still mid-streak, not completed yet
+      completedCount++;
+    });
     document.getElementById('userDetailContent').innerHTML = `
-      <div class="grid" style="margin-bottom:16px; grid-template-columns: 1fr 1fr;">
+      <div class="grid" style="margin-bottom:16px;">
         <div class="stat-box"><div class="stat-label">Name</div><div class="stat-value" style="font-size:15px;">${escapeHtml(d.name)}</div></div>
         <div class="stat-box"><div class="stat-label">Phone</div><div class="stat-value" style="font-size:15px;">${escapeHtml(d.phone||'—')}</div></div>
         <div class="stat-box"><div class="stat-label">Balance</div><div class="stat-value accent">${fmtMoney(d.balance)}</div></div>
         <div class="stat-box"><div class="stat-label">Referral Code</div><div class="stat-value" style="font-size:14px;">${escapeHtml(d.referralCode||'—')}</div></div>
-        <div class="stat-box"><div class="stat-label">Tasks Completed</div><div class="stat-value" style="font-size:15px;">${completedSnap.size}</div></div>
-        <div class="stat-box"><div class="stat-label">Users Referred</div><div class="stat-value" style="font-size:15px;">${referralSnap.size}</div></div>
+        <div class="stat-box"><div class="stat-label">Completed Tasks</div><div class="stat-value">${completedCount}</div></div>
+        <div class="stat-box"><div class="stat-label">Total Earnings</div><div class="stat-value">${fmtMoney(d.totalEarnings)}</div></div>
       </div>
-      <div class="section-title" style="margin-top:0;">Recent Transactions</div>
-      <div class="table-wrap">${txHtml}</div>`;
+      <div class="section-title" style="margin-top:0;">Recent Transactions (Activity History)</div>
+      ${txHtml}
+    `;
     openModal('userDetailModal');
-  }catch(err){ console.error(err); showToast('Failed to load user details.','error'); }
+  }catch(err){
+    console.error('viewUserDetail error:', err);
+    showToast('Failed to load user details — check the browser console (often a missing Firestore index).','error');
+  }
   showLoading(false);
 }
 
 /* =====================================================================================
    TASK MANAGEMENT
 ===================================================================================== */
-document.getElementById('taskType').addEventListener('change', function() {
-    document.getElementById('taskRequiredDaysField').classList.toggle('hidden', this.value !== 'app-install');
-});
 function listenTasksPage(){
-  unsubscribers.push(db.collection('tasks').orderBy('createdAt','desc').onSnapshot((snap)=>{
+  const unsub = db.collection('tasks').orderBy('createdAt','desc').onSnapshot((snap)=>{
     const body = document.getElementById('tasksTableBody');
     if(snap.empty){ body.innerHTML = '<tr><td colspan="6" class="empty-row">No tasks created yet</td></tr>'; return; }
     let html = '';
     snap.forEach(doc=>{
       const t = doc.data();
-      const details = t.type === 'app-install' ? `${t.requiredDays || 1} day` : (t.cooldownMinutes > 0 ? `${t.cooldownMinutes} min` : 'One-time');
-      html += `<tr><td>${escapeHtml(t.title)}</td><td>${escapeHtml(t.type)}</td><td>${fmtMoney(t.reward)}</td><td>${details}</td>
+      html += `<tr>
+        <td>${escapeHtml(t.title)}</td>
+        <td>${escapeHtml(t.type)}</td>
+        <td>${fmtMoney(t.reward)}</td>
+        <td>${t.cooldownMinutes>0 ? t.cooldownMinutes+' min' : 'One-time'}</td>
         <td><span class="pill ${t.enabled?'active':'banned'}">${t.enabled?'Enabled':'Disabled'}</span></td>
-        <td style="white-space:nowrap;"><button class="btn sm secondary" onclick='editTask("${doc.id}")'>Edit</button> <button class="btn sm danger" onclick="deleteTask('${doc.id}')">Delete</button></td></tr>`;
+        <td style="white-space:nowrap;">
+          <button class="btn sm secondary" onclick='editTask("${doc.id}")'>Edit</button>
+          <button class="btn sm danger" onclick="deleteTask('${doc.id}')">Delete</button>
+        </td>
+      </tr>`;
     });
     body.innerHTML = html;
-  }));
+  });
+  unsubscribers.push(unsub);
 }
+
+let taskCache = {};
 function openTaskModal(){
   document.getElementById('taskModalTitle').textContent = 'Create Task';
   document.getElementById('taskEditId').value = '';
-  document.querySelector('#taskModal form').reset();
+  document.getElementById('taskTitle').value = '';
+  document.getElementById('taskType').value = 'video';
+  document.getElementById('taskReward').value = '';
+  document.getElementById('taskCooldown').value = 0;
+  document.getElementById('taskLink').value = '';
+  document.getElementById('taskDescription').value = '';
   document.getElementById('taskEnabled').checked = true;
-  document.getElementById('taskRequiredDaysField').classList.add('hidden');
   openModal('taskModal');
 }
 async function editTask(id){
   showLoading(true);
   try{
-    const doc = await db.collection('tasks').doc(id).get(); const t = doc.data();
+    const doc = await db.collection('tasks').doc(id).get();
+    const t = doc.data();
     document.getElementById('taskModalTitle').textContent = 'Edit Task';
     document.getElementById('taskEditId').value = id;
-    document.getElementById('taskTitle').value = t.title; document.getElementById('taskType').value = t.type;
-    document.getElementById('taskReward').value = t.reward; document.getElementById('taskCooldown').value = t.cooldownMinutes;
-    document.getElementById('taskLink').value = t.link||''; document.getElementById('taskDescription').value = t.description||'';
+    document.getElementById('taskTitle').value = t.title;
+    document.getElementById('taskType').value = t.type;
+    document.getElementById('taskReward').value = t.reward;
+    document.getElementById('taskCooldown').value = t.cooldownMinutes;
+    document.getElementById('taskLink').value = t.link||'';
+    document.getElementById('taskDescription').value = t.description||'';
     document.getElementById('taskEnabled').checked = !!t.enabled;
-    document.getElementById('taskRequiredDays').value = t.requiredDays || 14;
-    document.getElementById('taskRequiredDaysField').classList.toggle('hidden', t.type !== 'app-install');
     openModal('taskModal');
   }catch(err){ showToast('Failed to load task.','error'); }
   showLoading(false);
@@ -699,22 +829,28 @@ async function saveTask(e){
   e.preventDefault();
   const id = document.getElementById('taskEditId').value;
   const data = {
-    title: document.getElementById('taskTitle').value.trim(), type: document.getElementById('taskType').value,
+    title: document.getElementById('taskTitle').value.trim(),
+    type: document.getElementById('taskType').value,
     reward: parseFloat(document.getElementById('taskReward').value),
     cooldownMinutes: parseInt(document.getElementById('taskCooldown').value,10),
-    link: document.getElementById('taskLink').value.trim(), description: document.getElementById('taskDescription').value.trim(),
+    link: document.getElementById('taskLink').value.trim(),
+    description: document.getElementById('taskDescription').value.trim(),
     enabled: document.getElementById('taskEnabled').checked
   };
-  if (data.type === 'app-install') {
-      data.requiredDays = parseInt(document.getElementById('taskRequiredDays').value, 10) || 1;
-  }
   showLoading(true);
   try{
-    if(id){ await db.collection('tasks').doc(id).update(data); showToast('Task updated.','success');
-    }else{ data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection('tasks').add(data); showToast('Task created.','success'); }
+    if(id){
+      await db.collection('tasks').doc(id).update(data);
+      showToast('Task updated.','success');
+    }else{
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection('tasks').add(data);
+      showToast('Task created.','success');
+    }
     closeModal('taskModal');
   }catch(err){ showToast('Failed to save task.','error'); }
-  showLoading(false); return false;
+  showLoading(false);
+  return false;
 }
 async function deleteTask(id){
   if(!confirm('Delete this task? This cannot be undone.')) return;
@@ -725,55 +861,21 @@ async function deleteTask(id){
 }
 
 /* =====================================================================================
-   WITHDRAWAL & OTHER MANAGEMENT
+   WITHDRAWAL MANAGEMENT
 ===================================================================================== */
-// Balance Modal
-function openBalanceModal(uid, name){
-  document.getElementById('balanceUserId').value = uid;
-  document.getElementById('balanceUserLabel').textContent = 'Adjusting balance for: ' + name;
-  document.querySelector('#balanceModal form').reset();
-  document.getElementById('balanceError').style.display = 'none';
-  openModal('balanceModal');
-}
-async function submitBalanceAdjust(e){
-  e.preventDefault();
-  const uid = document.getElementById('balanceUserId').value, action = document.getElementById('balanceAction').value;
-  const amount = parseFloat(document.getElementById('balanceAmount').value), reason = document.getElementById('balanceReason').value.trim();
-  const errEl = document.getElementById('balanceError'); errEl.style.display = 'none';
-  if(isNaN(amount) || amount <= 0){ errEl.textContent='Enter a valid amount.'; errEl.style.display='block'; return false; }
-  showLoading(true);
-  try{
-    const delta = action === 'add' ? amount : -amount;
-    const userRef = db.collection('users').doc(uid);
-    await db.runTransaction(async (tx)=>{
-      const snap = await tx.get(userRef); const bal = snap.data().balance || 0;
-      if(action === 'deduct' && bal < amount) throw new Error('INSUFFICIENT');
-      const update = { balance: firebase.firestore.FieldValue.increment(delta) };
-      if(action === 'add') update.totalEarnings = firebase.firestore.FieldValue.increment(amount);
-      tx.update(userRef, update);
-    });
-    await addTransaction(uid, `Admin: ${reason}`, amount, action==='add'?'credit':'debit');
-    await addNotification(uid, `An admin ${action==='add'?'added':'deducted'} ${fmtMoney(amount)} ${action==='add'?'to':'from'} your balance. Reason: ${reason}`);
-    showToast('Balance updated.','success'); closeModal('balanceModal');
-  }catch(err){
-    if(err.message === 'INSUFFICIENT'){ errEl.textContent = 'User balance is too low for this deduction.'; errEl.style.display='block'; }
-    else { showToast('Failed to adjust balance.','error'); }
-  }
-  showLoading(false); return false;
-}
-
-// Withdrawals
-let currentWithdrawFilter = 'pending', allWithdrawCache = [];
+let currentWithdrawFilter = 'pending';
 function filterWithdraw(status){
   currentWithdrawFilter = status;
   document.querySelectorAll('#admin-page-withdraw .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.status===status));
   renderWithdrawTable();
 }
+let allWithdrawCache = [];
 function listenWithdrawPage(){
-  unsubscribers.push(db.collection('withdrawRequests').orderBy('createdAt','desc').onSnapshot((snap)=>{
+  const unsub = db.collection('withdrawRequests').orderBy('createdAt','desc').onSnapshot((snap)=>{
     allWithdrawCache = snap.docs.map(d=>({ id:d.id, ...d.data() }));
     renderWithdrawTable();
-  }));
+  });
+  unsubscribers.push(unsub);
 }
 function renderWithdrawTable(){
   const body = document.getElementById('withdrawTableBody');
@@ -781,65 +883,93 @@ function renderWithdrawTable(){
   if(filtered.length === 0){ body.innerHTML = `<tr><td colspan="7" class="empty-row">No ${currentWithdrawFilter} requests</td></tr>`; return; }
   let html = '';
   filtered.forEach(w=>{
-    const uname = (allUsersCache[w.uid]||{}).name || w.uid.slice(0,10)+'...';
-    let actions = (w.status === 'pending') ? `<button class="btn sm ok" onclick="approveWithdraw('${w.id}')">Approve</button> <button class="btn sm danger" onclick="rejectWithdraw('${w.id}')">Reject</button>` : `<span style="color:var(--muted); font-size:11px;">Processed</span>`;
-    html += `<tr><td>${escapeHtml(uname)}</td><td>${w.method}</td><td>${escapeHtml(w.account)}</td><td>${fmtMoney(w.amount)}</td><td>${w.createdAt?w.createdAt.toDate().toLocaleString():'—'}</td><td>${escapeHtml(w.adminNote||'—')}</td><td>${actions}</td></tr>`;
+    const uinfo = allUsersCache[w.uid];
+    const uname = uinfo ? uinfo.name : w.uid.slice(0,10)+'...';
+    const date = w.createdAt ? w.createdAt.toDate().toLocaleString() : '—';
+    let actions = '';
+    if(w.status === 'pending'){
+      actions = `<button class="btn sm ok" onclick="approveWithdraw('${w.id}')">Approve</button> <button class="btn sm danger" onclick="rejectWithdraw('${w.id}')">Reject</button>`;
+    } else {
+      actions = `<span style="color:var(--muted); font-size:11px;">Processed</span>`;
+    }
+    html += `<tr><td>${escapeHtml(uname)}</td><td>${w.method}</td><td>${escapeHtml(w.account)}</td><td>${fmtMoney(w.amount)}</td><td>${date}</td><td>${escapeHtml(w.adminNote||'—')}</td><td>${actions}</td></tr>`;
   });
   body.innerHTML = html;
 }
+
 async function approveWithdraw(id){
-  if(!confirm('Approve this withdrawal? This will update the user\'s stats and cannot be undone.')) return;
+  if(!confirm('Approve this withdrawal request?')) return;
   showLoading(true);
   try{
-    const wRef = db.collection('withdrawRequests').doc(id); const wSnap = await wRef.get(); const w = wSnap.data();
+    const wRef = db.collection('withdrawRequests').doc(id);
+    const wSnap = await wRef.get();
+    const w = wSnap.data();
     await db.runTransaction(async (tx)=>{
-      tx.update(db.collection('users').doc(w.uid), {
+      const userRef = db.collection('users').doc(w.uid);
+      tx.update(userRef, {
         pendingWithdraw: firebase.firestore.FieldValue.increment(-w.amount),
         totalWithdrawn: firebase.firestore.FieldValue.increment(w.amount)
       });
       tx.update(wRef, { status:'approved', adminNote: 'Approved', processedAt: firebase.firestore.FieldValue.serverTimestamp(), processedBy: adminUser.email });
     });
+    await addTransaction(w.uid, `Withdraw approved (${w.method})`, w.amount, 'debit');
     await addNotification(w.uid, `Your withdrawal of ${fmtMoney(w.amount)} has been approved and processed.`);
     showToast('Withdrawal approved.','success');
-  }catch(err){ showToast('Failed to approve withdrawal.','error'); console.error(err); }
+  }catch(err){ showToast('Failed to approve withdrawal.','error'); }
   showLoading(false);
 }
+
 async function rejectWithdraw(id){
-  const reason = prompt('Reason for rejecting this withdrawal (visible to user):'); if(reason === null) return;
+  const reason = prompt('Reason for rejecting this withdrawal (shown to the user):');
+  if(reason === null) return;
   showLoading(true);
   try{
-    const wRef = db.collection('withdrawRequests').doc(id); const wSnap = await wRef.get(); const w = wSnap.data();
+    const wRef = db.collection('withdrawRequests').doc(id);
+    const wSnap = await wRef.get();
+    const w = wSnap.data();
     await db.runTransaction(async (tx)=>{
-      tx.update(db.collection('users').doc(w.uid), {
+      const userRef = db.collection('users').doc(w.uid);
+      tx.update(userRef, {
         balance: firebase.firestore.FieldValue.increment(w.amount),
         pendingWithdraw: firebase.firestore.FieldValue.increment(-w.amount)
       });
       tx.update(wRef, { status:'rejected', adminNote: reason || 'Rejected', processedAt: firebase.firestore.FieldValue.serverTimestamp(), processedBy: adminUser.email });
     });
-    await addTransaction(w.uid, `Withdrawal rejected & refunded`, w.amount, 'credit');
-    await addNotification(w.uid, `Your withdrawal of ${fmtMoney(w.amount)} was rejected. Reason: ${reason||'Not specified'}. The amount has been refunded.`);
+    await addTransaction(w.uid, `Withdraw rejected — refunded (${w.method})`, w.amount, 'credit');
+    await addNotification(w.uid, `Your withdrawal of ${fmtMoney(w.amount)} was rejected. Reason: ${reason||'Not specified'}. The amount has been refunded to your balance.`);
     showToast('Withdrawal rejected and refunded.','info');
   }catch(err){ showToast('Failed to reject withdrawal.','error'); }
   showLoading(false);
 }
 
-// Referrals
+/* =====================================================================================
+   REFERRAL MANAGEMENT
+===================================================================================== */
 function listenReferralPage(){
-  unsubscribers.push(db.collection('referrals').orderBy('createdAt','desc').limit(50).onSnapshot((snap)=>{
+  const unsub = db.collection('referrals').orderBy('createdAt','desc').limit(50).onSnapshot((snap)=>{
     const body = document.getElementById('referralsTableBody');
     if(snap.empty){ body.innerHTML = '<tr><td colspan="4" class="empty-row">No referrals yet</td></tr>'; return; }
     let html = '';
     snap.forEach(doc=>{
       const r = doc.data();
-      html += `<tr><td>${escapeHtml((allUsersCache[r.referrerUid]||{}).name || r.referrerUid.slice(0,10)+'...')}</td><td>${escapeHtml(r.referredName||'—')}</td><td>${fmtMoney(r.referrerBonus)}</td><td>${r.createdAt?r.createdAt.toDate().toLocaleString():'—'}</td></tr>`;
+      const date = r.createdAt ? r.createdAt.toDate().toLocaleString() : '—';
+      html += `<tr><td>${escapeHtml((allUsersCache[r.referrerUid]||{}).name || r.referrerUid.slice(0,10)+'...')}</td><td>${escapeHtml(r.referredName||'—')}</td><td>${fmtMoney(r.referrerBonus)}</td><td>${date}</td></tr>`;
     });
     body.innerHTML = html;
-  }));
+  });
+  unsubscribers.push(unsub);
+
   db.collection('settings').doc('global').get().then(doc=>{
-    if(!doc.exists) return; const s = doc.data();
-    document.getElementById('referralEnabledToggle').checked = s.referralEnabled !== false;
-    document.getElementById('referrerBonusInput').value = s.referrerBonus ?? 5.00;
-    document.getElementById('referredBonusInput').value = s.referredBonus ?? 2.00;
+    if(doc.exists){
+      const s = doc.data();
+      document.getElementById('referralEnabledToggle').checked = s.referralEnabled !== false;
+      document.getElementById('referrerBonusInput').value = s.referrerBonus ?? 5.00;
+      document.getElementById('referredBonusInput').value = s.referredBonus ?? 2.00;
+    } else {
+      document.getElementById('referralEnabledToggle').checked = true;
+      document.getElementById('referrerBonusInput').value = 5.00;
+      document.getElementById('referredBonusInput').value = 2.00;
+    }
   });
 }
 async function saveReferralSettings(){
@@ -851,16 +981,19 @@ async function saveReferralSettings(){
       referredBonus: parseFloat(document.getElementById('referredBonusInput').value) || 0
     }, { merge:true });
     showToast('Referral settings saved.','success');
-  }catch(err){ showToast('Failed to save settings.','error'); }
+  }catch(err){ showToast('Failed to save referral settings.','error'); }
   showLoading(false);
 }
 
-// Ads Manager
+/* =====================================================================================
+   ADS MANAGER
+===================================================================================== */
 function loadAdsConfig(){
   db.collection('ads').doc('config').get().then(doc=>{
     const a = doc.exists ? doc.data() : {};
     document.getElementById('bannerEnabled').checked = a.bannerEnabled !== false;
     document.getElementById('bannerAdUnitId').value = a.bannerAdUnitId || '';
+    document.getElementById('bannerCode').value = a.bannerCode || '';
     document.getElementById('rewardedEnabled').checked = a.rewardedEnabled !== false;
     document.getElementById('rewardedAdUnitId').value = a.rewardedAdUnitId || '';
     document.getElementById('interstitialEnabled').checked = a.interstitialEnabled !== false;
@@ -868,77 +1001,108 @@ function loadAdsConfig(){
   });
 }
 async function saveAdsConfig(e){
-  e.preventDefault(); showLoading(true);
+  e.preventDefault();
+  showLoading(true);
   try{
     await db.collection('ads').doc('config').set({
-      bannerEnabled: document.getElementById('bannerEnabled').checked, bannerAdUnitId: document.getElementById('bannerAdUnitId').value.trim(),
-      rewardedEnabled: document.getElementById('rewardedEnabled').checked, rewardedAdUnitId: document.getElementById('rewardedAdUnitId').value.trim(),
-      interstitialEnabled: document.getElementById('interstitialEnabled').checked, interstitialAdUnitId: document.getElementById('interstitialAdUnitId').value.trim()
+      bannerEnabled: document.getElementById('bannerEnabled').checked,
+      bannerAdUnitId: document.getElementById('bannerAdUnitId').value.trim(),
+      bannerCode: document.getElementById('bannerCode').value,
+      rewardedEnabled: document.getElementById('rewardedEnabled').checked,
+      rewardedAdUnitId: document.getElementById('rewardedAdUnitId').value.trim(),
+      interstitialEnabled: document.getElementById('interstitialEnabled').checked,
+      interstitialAdUnitId: document.getElementById('interstitialAdUnitId').value.trim()
     }, { merge:true });
     showToast('Ads configuration saved.','success');
   }catch(err){ showToast('Failed to save ads configuration.','error'); }
-  showLoading(false); return false;
+  showLoading(false);
+  return false;
 }
 
-// Notifications
-async function addNotification(uid, message){ await db.collection('notifications').add({ uid, message, read:false, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); }
-async function addTransaction(uid, label, amount, type){ await db.collection('transactions').add({ uid, label, amount, type, createdAt: firebase.firestore.FieldValue.serverTimestamp() }); }
-function toggleNotifTargetUser(){ document.getElementById('notifUserPickWrap').classList.toggle('hidden', document.getElementById('notifTarget').value !== 'single'); }
+/* =====================================================================================
+   NOTIFICATION MANAGEMENT
+===================================================================================== */
+function toggleNotifTargetUser(){
+  document.getElementById('notifUserPickWrap').classList.toggle('hidden', document.getElementById('notifTarget').value !== 'single');
+}
+async function addNotification(uid, message){
+  await db.collection('notifications').add({ uid, message, read:false, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+}
+async function addTransaction(uid, label, amount, type){
+  await db.collection('transactions').add({ uid, label, amount, type, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+}
+
 async function sendNotification(){
-  const target = document.getElementById('notifTarget').value, message = document.getElementById('notifMessage').value.trim();
+  const target = document.getElementById('notifTarget').value;
+  const message = document.getElementById('notifMessage').value.trim();
+  const scheduleVal = document.getElementById('notifSchedule').value;
   if(!message){ showToast('Please write a message.','error'); return; }
+
+  let targetUid = 'all';
+  if(target === 'single'){
+    const email = document.getElementById('notifUserEmail').value.trim();
+    if(!email){ showToast('Enter the target user\'s email.','error'); return; }
+    const q = await db.collection('users').where('email','==',email).limit(1).get();
+    if(q.empty){ showToast('No user found with that email.','error'); return; }
+    targetUid = q.docs[0].id;
+  }
+
   showLoading(true);
   try{
-    let targetUid = 'all', successCount = 0;
-    if(target === 'single'){
-      const email = document.getElementById('notifUserEmail').value.trim();
-      if(!email){ showToast('Enter target user email.','error'); showLoading(false); return; }
-      const q = await db.collection('users').where('email','==',email).limit(1).get();
-      if(q.empty){ showToast('No user found with that email.','error'); showLoading(false); return; }
-      targetUid = q.docs[0].id;
-      await addNotification(targetUid, message); successCount = 1;
-    } else {
+    if(scheduleVal){
+      // Scheduled — stored for a Cloud Function to dispatch at sendAt (see setup guide)
+      await db.collection('scheduledNotifications').add({
+        message, target: targetUid, status:'scheduled',
+        sendAt: firebase.firestore.Timestamp.fromDate(new Date(scheduleVal)),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        createdBy: adminUser.email
+      });
+      showToast('Announcement scheduled.','success');
+    } else if(targetUid === 'all'){
       const usersSnap = await db.collection('users').get();
-      for(let i=0; i<usersSnap.docs.length; i+=450){
+      const docs = usersSnap.docs;
+      // Firestore batches max out at 500 writes — chunk accordingly
+      for(let i=0; i<docs.length; i+=450){
         const batch = db.batch();
-        usersSnap.docs.slice(i, i+450).forEach(u=>{
-          batch.set(db.collection('notifications').doc(), { uid: u.id, message, read:false, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        docs.slice(i, i+450).forEach(u=>{
+          const ref = db.collection('notifications').doc();
+          batch.set(ref, { uid: u.id, message, read:false, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
         });
         await batch.commit();
       }
-      successCount = usersSnap.size;
+      await db.collection('scheduledNotifications').add({ message, target:'all', status:'sent', sendAt: firebase.firestore.FieldValue.serverTimestamp(), createdAt: firebase.firestore.FieldValue.serverTimestamp(), createdBy: adminUser.email });
+      showToast(`Notification sent to ${docs.length} users.`,'success');
+    } else {
+      await addNotification(targetUid, message);
+      await db.collection('scheduledNotifications').add({ message, target: targetUid, status:'sent', sendAt: firebase.firestore.FieldValue.serverTimestamp(), createdAt: firebase.firestore.FieldValue.serverTimestamp(), createdBy: adminUser.email });
+      showToast('Notification sent.','success');
     }
-    await db.collection('scheduledNotifications').add({ message, target: targetUid, status:'sent', sendAt: firebase.firestore.FieldValue.serverTimestamp(), createdAt: firebase.firestore.FieldValue.serverTimestamp(), createdBy: adminUser.email });
-    showToast(`Notification sent to ${successCount} user(s).`,'success');
     document.getElementById('notifMessage').value = '';
-  }catch(err){ showToast('Failed to send notification.','error'); console.error(err); }
+    document.getElementById('notifSchedule').value = '';
+  }catch(err){ showToast('Failed to send notification.','error'); }
   showLoading(false);
 }
+
 function listenScheduledNotifications(){
-  unsubscribers.push(db.collection('scheduledNotifications').orderBy('createdAt','desc').limit(30).onSnapshot((snap)=>{
+  const unsub = db.collection('scheduledNotifications').orderBy('createdAt','desc').limit(30).onSnapshot((snap)=>{
     const body = document.getElementById('scheduledTableBody');
-    if(snap.empty){ body.innerHTML = '<tr><td colspan="4" class="empty-row">No announcements sent</td></tr>'; return; }
+    if(snap.empty){ body.innerHTML = '<tr><td colspan="4" class="empty-row">No announcements yet</td></tr>'; return; }
     let html = '';
     snap.forEach(doc=>{
       const n = doc.data();
-      const targetLabel = n.target === 'all' ? 'All Users' : ((allUsersCache[n.target]||{}).name || n.target.slice(0,10)+'...');
-      html += `<tr><td>${escapeHtml(n.message)}</td><td>${escapeHtml(targetLabel)}</td><td>${n.sendAt?n.sendAt.toDate().toLocaleString():'—'}</td><td><span class="pill ${n.status==='sent'?'active':'pending'}">${n.status}</span></td></tr>`;
+      const targetLabel = n.target === 'all' ? 'All Users' : (allUsersCache[n.target]?.name || n.target.slice(0,10)+'...');
+      const sendTime = n.sendAt ? n.sendAt.toDate().toLocaleString() : '—';
+      html += `<tr><td>${escapeHtml(n.message)}</td><td>${escapeHtml(targetLabel)}</td><td>${sendTime}</td><td><span class="pill ${n.status==='sent'?'active':'pending'}">${n.status}</span></td></tr>`;
     });
     body.innerHTML = html;
-  }));
+  });
+  unsubscribers.push(unsub);
 }
 
-// Global Settings
-async function loadGlobalSettings(){
-  try {
-    const doc = await db.collection('settings').doc('global').get();
-    const s = doc.exists ? doc.data() : {};
-    if (s.currency === 'USD') GLOBAL_SETTINGS.currency = '$';
-    else if (s.currency === 'INR') GLOBAL_SETTINGS.currency = '₹';
-    else GLOBAL_SETTINGS.currency = '৳';
-  } catch(e) { console.warn("Could not load global settings, using defaults."); }
-}
-function populateSettingsPage(){
+/* =====================================================================================
+   GLOBAL SETTINGS
+===================================================================================== */
+function loadGlobalSettings(){
   db.collection('settings').doc('global').get().then(doc=>{
     const s = doc.exists ? doc.data() : {};
     document.getElementById('setMinWithdraw').value = s.minWithdraw ?? 100;
@@ -948,17 +1112,27 @@ function populateSettingsPage(){
   });
 }
 async function saveGlobalSettings(e){
-  e.preventDefault(); showLoading(true);
+  e.preventDefault();
+  showLoading(true);
   try{
+    const newCurrency = document.getElementById('setCurrency').value;
     await db.collection('settings').doc('global').set({
       minWithdraw: parseFloat(document.getElementById('setMinWithdraw').value),
       dailyBonusAmount: parseFloat(document.getElementById('setDailyBonus').value),
-      currency: document.getElementById('setCurrency').value,
+      currency: newCurrency,
       maintenanceMode: document.getElementById('setMaintenanceMode').checked
     }, { merge:true });
-    showToast('Settings saved. Refresh to see currency changes.','success');
+    if(newCurrency !== CURRENT_CURRENCY){
+      CURRENT_CURRENCY = newCurrency;
+      // Every money figure already on screen was rendered with the old symbol — cleanest
+      // way to make them all correct immediately is to restart every listener.
+      detachAll();
+      initAllListeners();
+    }
+    showToast('Settings saved.','success');
   }catch(err){ showToast('Failed to save settings.','error'); }
-  showLoading(false); return false;
+  showLoading(false);
+  return false;
 }
 </script>
 </body>
