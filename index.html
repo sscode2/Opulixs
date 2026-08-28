@@ -399,13 +399,15 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
 /* =====================================================================================
    FIREBASE CONFIG — use the SAME project/config as the OPULIX user app (index.html)
 ===================================================================================== */
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAyZk5v3jpJ4e7ltx0CdIKaZsPy2p0QXUQ",
+  authDomain: "opulix-app.firebaseapp.com",
+  projectId: "opulix-app",
+  storageBucket: "opulix-app.firebasestorage.app",
+  messagingSenderId: "607811760478",
+  appId: "1:607811760478:web:2ae82447b32fc031489fcf",
+  measurementId: "G-QX6L49K050"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
