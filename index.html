@@ -222,6 +222,15 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
             <tbody id="tasksTableBody"><tr><td colspan="6" class="empty-row">Loading...</td></tr></tbody>
           </table>
         </div>
+
+        <div class="section-title">How to Work Videos</div>
+        <div class="toolbar"><button class="btn" onclick="openTutorialModal()">+ Add Tutorial Video</button></div>
+        <div class="card table-wrap">
+          <table>
+            <thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="tutorialsTableBody"><tr><td colspan="4" class="empty-row">Loading...</td></tr></tbody>
+          </table>
+        </div>
       </div>
 
       <!-- ================= WITHDRAWALS ================= -->
@@ -343,6 +352,25 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
   </div>
 </div>
 
+<div id="tutorialModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-title"><span id="tutorialModalTitle">Add Tutorial Video</span><button class="modal-close" onclick="closeModal('tutorialModal')">✕</button></div>
+    <form onsubmit="return saveTutorial(event)">
+      <input type="hidden" id="tutorialEditId" />
+      <div class="field"><label>Title</label><input type="text" id="tutorialTitle" required placeholder="e.g. How to complete YouTube tasks" /></div>
+      <div class="field"><label>YouTube URL</label><input type="text" id="tutorialUrl" required placeholder="https://www.youtube.com/watch?v=..." /></div>
+      <div class="field"><label>Category</label>
+        <select id="tutorialCategory">
+          <option value="Work">Work</option>
+          <option value="Task">Task</option>
+        </select>
+      </div>
+      <div class="toggle-row"><span>Enabled</span><label class="switch"><input type="checkbox" id="tutorialEnabled" checked /><span class="slider-tog"></span></label></div>
+      <button class="btn block" type="submit">Save Tutorial</button>
+    </form>
+  </div>
+</div>
+
 <div id="balanceModal" class="modal-overlay hidden">
   <div class="modal-box">
     <div class="modal-title">Adjust Balance<button class="modal-close" onclick="closeModal('balanceModal')">✕</button></div>
@@ -371,15 +399,13 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
 /* =====================================================================================
    FIREBASE CONFIG — use the SAME project/config as the OPULIX user app (index.html)
 ===================================================================================== */
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyAyZk5v3jpJ4e7ltx0CdIKaZsPy2p0QXUQ",
-  authDomain: "opulix-app.firebaseapp.com",
-  projectId: "opulix-app",
-  storageBucket: "opulix-app.firebasestorage.app",
-  messagingSenderId: "607811760478",
-  appId: "1:607811760478:web:2ae82447b32fc031489fcf",
-  measurementId: "G-QX6L49K050"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
@@ -401,7 +427,7 @@ function openModal(id){ document.getElementById(id).classList.remove('hidden'); 
 function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
 function escapeHtml(str){ const d=document.createElement('div'); d.textContent=str||''; return d.innerHTML; }
 const CURRENCY_SYMBOLS = { BDT:'৳', USD:'$', INR:'₹' };
-let CURRENT_CURRENCY = 'BDT'; // overwritten from settings/global before listeners start
+let CURRENT_CURRENCY = 'BDT';
 function fmtMoney(n){ return (CURRENCY_SYMBOLS[CURRENT_CURRENCY] || '৳') + (n||0).toFixed(2); }
 
 /* =====================================================================================
@@ -417,7 +443,6 @@ async function handleAdminLogin(e){
   try{
     await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     await auth.signInWithEmailAndPassword(email, password);
-    // onAuthStateChanged handles the admin check + redirect
   }catch(err){
     errEl.textContent = friendlyAuthError(err);
     errEl.style.display='block';
@@ -465,7 +490,7 @@ auth.onAuthStateChanged(async (user)=>{
     try{
       const settingsDoc = await db.collection('settings').doc('global').get();
       if(settingsDoc.exists && settingsDoc.data().currency) CURRENT_CURRENCY = settingsDoc.data().currency;
-    }catch(err){ /* fall back to BDT default if this fails */ }
+    }catch(err){ /* fall back to BDT default */ }
     initAllListeners();
   }catch(err){
     showToast('Failed to verify admin access.','error');
@@ -489,13 +514,14 @@ function goAdminPage(page){
 }
 
 /* =====================================================================================
-   INIT ALL REALTIME LISTENERS (after admin verified)
+   INIT ALL REALTIME LISTENERS
 ===================================================================================== */
-let allUsersCache = {}; // uid -> user data, built from the dashboard/users listeners
+let allUsersCache = {};
 function initAllListeners(){
   listenDashboardStats();
   listenUsersPage();
   listenTasksPage();
+  listenTutorialsPage();
   listenWithdrawPage();
   listenReferralPage();
   loadGlobalSettings();
@@ -527,8 +553,6 @@ function listenDashboardStats(){
   }, err=>console.error(err));
   unsubscribers.push(uUnsub);
 
-  // "Tasks Completed" merges two collections: completedTasks (all non-app-install task
-  // types) and appInstallProgress (only docs whose check-in streak reached "completed").
   let lastCompletedTasksCount = 0, lastCompletedInstallsCount = 0;
   function updateTasksCompletedStat(){
     document.getElementById('statTasksCompleted').textContent = lastCompletedTasksCount + lastCompletedInstallsCount;
@@ -726,8 +750,8 @@ async function viewUserDetail(uid){
     const d = userDoc.data();
     const [txSnap, completedSnap, installSnap] = await Promise.all([
       db.collection('transactions').where('uid','==',uid).orderBy('createdAt','desc').limit(15).get(),
-      db.collection('completedTasks').where('uid','==',uid).get(), // equality-only filter, no composite index needed
-      db.collection('appInstallProgress').where('uid','==',uid).get() // equality-only filter, no composite index needed
+      db.collection('completedTasks').where('uid','==',uid).get(),
+      db.collection('appInstallProgress').where('uid','==',uid).get()
     ]);
     let txHtml = '<div class="empty-row">No transactions</div>';
     if(!txSnap.empty){
@@ -739,9 +763,6 @@ async function viewUserDetail(uid){
       });
       txHtml += '</tbody></table>';
     }
-    // Count only genuinely completed items across BOTH collections: regular one-time/repeatable
-    // tasks (completedTasks) always count once they exist here; App Install tasks live in
-    // appInstallProgress and only count once their check-in streak reaches status "completed".
     let completedCount = 0;
     completedSnap.forEach(doc=> completedCount++);
     installSnap.forEach(doc=>{ if(doc.data().status === 'completed') completedCount++; });
@@ -760,13 +781,13 @@ async function viewUserDetail(uid){
     openModal('userDetailModal');
   }catch(err){
     console.error('viewUserDetail error:', err);
-    showToast('Failed to load user details — check the browser console (often a missing Firestore index).','error');
+    showToast('Failed to load user details.','error');
   }
   showLoading(false);
 }
 
 /* =====================================================================================
-   TASK MANAGEMENT
+   TASK MANAGEMENT & HOW TO WORK TUTORIAL VIDEOS
 ===================================================================================== */
 function listenTasksPage(){
   const unsub = db.collection('tasks').orderBy('createdAt','desc').onSnapshot((snap)=>{
@@ -792,7 +813,6 @@ function listenTasksPage(){
   unsubscribers.push(unsub);
 }
 
-let taskCache = {};
 function onTaskTypeChange(){
   const isAppInstall = document.getElementById('taskType').value === 'app-install';
   document.getElementById('standardTaskFields').classList.toggle('hidden', isAppInstall);
@@ -888,6 +908,86 @@ async function deleteTask(id){
   showLoading(true);
   try{ await db.collection('tasks').doc(id).delete(); showToast('Task deleted.','success'); }
   catch(err){ showToast('Failed to delete task.','error'); }
+  showLoading(false);
+}
+
+/* Tutorial Videos Functions */
+function listenTutorialsPage(){
+  const unsub = db.collection('tutorials').orderBy('createdAt','desc').onSnapshot((snap)=>{
+    const body = document.getElementById('tutorialsTableBody');
+    if(snap.empty){ body.innerHTML = '<tr><td colspan="4" class="empty-row">No tutorial videos yet</td></tr>'; return; }
+    let html = '';
+    snap.forEach(doc=>{
+      const v = doc.data();
+      html += `<tr>
+        <td>${escapeHtml(v.title)}</td>
+        <td>${escapeHtml(v.category)}</td>
+        <td><span class="pill ${v.enabled?'active':'banned'}">${v.enabled?'Enabled':'Disabled'}</span></td>
+        <td style="white-space:nowrap;">
+          <button class="btn sm secondary" onclick='editTutorial("${doc.id}")'>Edit</button>
+          <button class="btn sm danger" onclick="deleteTutorial('${doc.id}')">Delete</button>
+        </td>
+      </tr>`;
+    });
+    body.innerHTML = html;
+  });
+  unsubscribers.push(unsub);
+}
+function openTutorialModal(){
+  document.getElementById('tutorialModalTitle').textContent = 'Add Tutorial Video';
+  document.getElementById('tutorialEditId').value = '';
+  document.getElementById('tutorialTitle').value = '';
+  document.getElementById('tutorialUrl').value = '';
+  document.getElementById('tutorialCategory').value = 'Work';
+  document.getElementById('tutorialEnabled').checked = true;
+  openModal('tutorialModal');
+}
+async function editTutorial(id){
+  showLoading(true);
+  try{
+    const doc = await db.collection('tutorials').doc(id).get();
+    const v = doc.data();
+    document.getElementById('tutorialModalTitle').textContent = 'Edit Tutorial Video';
+    document.getElementById('tutorialEditId').value = id;
+    document.getElementById('tutorialTitle').value = v.title;
+    document.getElementById('tutorialUrl').value = v.youtubeUrl;
+    document.getElementById('tutorialCategory').value = v.category || 'Work';
+    document.getElementById('tutorialEnabled').checked = !!v.enabled;
+    openModal('tutorialModal');
+  }catch(err){ showToast('Failed to load tutorial.','error'); }
+  showLoading(false);
+}
+async function saveTutorial(e){
+  e.preventDefault();
+  const id = document.getElementById('tutorialEditId').value;
+  const data = {
+    title: document.getElementById('tutorialTitle').value.trim(),
+    youtubeUrl: document.getElementById('tutorialUrl').value.trim(),
+    category: document.getElementById('tutorialCategory').value,
+    enabled: document.getElementById('tutorialEnabled').checked
+  };
+  showLoading(true);
+  try{
+    if(id){
+      await db.collection('tutorials').doc(id).update(data);
+      showToast('Tutorial saved.','success');
+    } else {
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection('tutorials').add(data);
+      showToast('Tutorial added.','success');
+    }
+    closeModal('tutorialModal');
+  }catch(err){ showToast('Failed to save tutorial.','error'); }
+  showLoading(false);
+  return false;
+}
+async function deleteTutorial(id){
+  if(!confirm('Delete this tutorial video?')) return;
+  showLoading(true);
+  try{
+    await db.collection('tutorials').doc(id).delete();
+    showToast('Tutorial deleted.','success');
+  }catch(err){ showToast('Failed to delete tutorial.','error'); }
   showLoading(false);
 }
 
@@ -1047,7 +1147,6 @@ async function sendNotification(){
   showLoading(true);
   try{
     if(scheduleVal){
-      // Scheduled — stored for a Cloud Function to dispatch at sendAt (see setup guide)
       await db.collection('scheduledNotifications').add({
         message, target: targetUid, status:'scheduled',
         sendAt: firebase.firestore.Timestamp.fromDate(new Date(scheduleVal)),
@@ -1058,7 +1157,6 @@ async function sendNotification(){
     } else if(targetUid === 'all'){
       const usersSnap = await db.collection('users').get();
       const docs = usersSnap.docs;
-      // Firestore batches max out at 500 writes — chunk accordingly
       for(let i=0; i<docs.length; i+=450){
         const batch = db.batch();
         docs.slice(i, i+450).forEach(u=>{
@@ -1121,8 +1219,6 @@ async function saveGlobalSettings(e){
     }, { merge:true });
     if(newCurrency !== CURRENT_CURRENCY){
       CURRENT_CURRENCY = newCurrency;
-      // Every money figure already on screen was rendered with the old symbol — cleanest
-      // way to make them all correct immediately is to restart every listener.
       detachAll();
       initAllListeners();
     }
