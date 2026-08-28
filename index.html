@@ -52,7 +52,7 @@ th{color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase
 .sidebar{width:var(--sidebar-w); flex-shrink:0; background:var(--card); border-right:1px solid rgba(255,255,255,.06); padding:20px 14px; position:fixed; top:0; bottom:0; left:0; overflow-y:auto; transition:transform .25s; z-index:80;}
 .sidebar-logo{font-size:20px; font-weight:900; padding:0 8px 20px; letter-spacing:.5px;}
 .sidebar-logo span{color:var(--accent);}
-.side-link{display:flex; align-items:center; gap:10px; padding:11px 10px; border-radius:10px; color:var(--muted); font-size:13px; font-weight:600; margin-bottom:4px; background:none; border:none; width:100%; text-align:left;}
+.side-link{display:flex; align-items:center; gap:10px; padding:11px 10px; border-radius:10px; color:var(--muted); font-size:13px; font-weight:600; margin-bottom:4px;}
 .side-link .ic{font-size:16px; width:20px; text-align:center;}
 .side-link.active{background:var(--accent); color:#fff;}
 .side-link:hover:not(.active){background:var(--card2); color:var(--text);}
@@ -88,6 +88,12 @@ th{color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase
 
 .table-wrap{overflow-x:auto;}
 .mini-avatar{width:30px; height:30px; border-radius:50%; object-fit:cover; vertical-align:middle; margin-right:8px;}
+
+.bar-row{display:flex; align-items:center; gap:10px; margin-bottom:8px; font-size:12px;}
+.bar-track{flex:1; height:10px; background:var(--card2); border-radius:6px; overflow:hidden;}
+.bar-fill{height:100%; background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.bar-label{width:60px; color:var(--muted); flex-shrink:0;}
+.bar-val{width:70px; text-align:right; font-weight:700; flex-shrink:0;}
 
 /* ---------- Modal ---------- */
 .modal-overlay{position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:900; display:flex; align-items:center; justify-content:center; padding:16px;}
@@ -126,7 +132,7 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
 <div id="toastWrap"></div>
 <div id="loadingOverlay" class="hidden"><div class="spinner"></div></div>
 
-<!-- ADMIN LOGIN -->
+<!-- ============================================================= ADMIN LOGIN ============================================================= -->
 <div id="adminLoginScreen">
   <div class="login-box">
     <div class="login-logo">OPUL<span>IX</span></div>
@@ -135,13 +141,14 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
       <div class="field"><label>Admin Email</label><input type="email" id="adminEmail" required placeholder="admin@opulix.com" /></div>
       <div class="field"><label>Password</label><input type="password" id="adminPassword" required placeholder="••••••••" /></div>
       <div class="error-text" id="adminLoginError"></div>
-      <button class="btn block" type="submit">Login to Admin Panel</button>
+      <button class="btn block" type="submit" style="width:100%;">Login to Admin Panel</button>
     </form>
   </div>
 </div>
 
-<!-- ADMIN SHELL -->
+<!-- ============================================================= ADMIN SHELL ============================================================= -->
 <div id="adminShell" class="hidden">
+
   <div class="sidebar" id="sidebar">
     <div class="sidebar-logo">OPUL<span>IX</span> Admin</div>
     <button class="side-link active" data-page="dashboard" onclick="goAdminPage('dashboard')"><span class="ic">📊</span>Dashboard</button>
@@ -166,7 +173,8 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
     </div>
 
     <div class="content">
-      <!-- DASHBOARD -->
+
+      <!-- ================= DASHBOARD ================= -->
       <div id="admin-page-dashboard" class="admin-page">
         <div class="grid">
           <div class="stat-box"><div class="stat-label">Total Users</div><div class="stat-value" id="statTotalUsers">0</div></div>
@@ -174,8 +182,13 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
           <div class="stat-box"><div class="stat-label">Total Earnings Paid</div><div class="stat-value" id="statTotalEarnings">৳0.00</div></div>
           <div class="stat-box"><div class="stat-label">Pending Withdraw</div><div class="stat-value warn" id="statPendingWithdraw">৳0.00</div></div>
           <div class="stat-box"><div class="stat-label">Approved Withdraw</div><div class="stat-value accent" id="statApprovedWithdraw">৳0.00</div></div>
+          <div class="stat-box"><div class="stat-label">Tasks Completed</div><div class="stat-value" id="statTasksCompleted">0</div></div>
           <div class="stat-box"><div class="stat-label">Total Referrals</div><div class="stat-value" id="statTotalReferrals">0</div></div>
+          <div class="stat-box"><div class="stat-label">Referral Payouts</div><div class="stat-value" id="statReferralPayouts">৳0.00</div></div>
         </div>
+
+        <div class="section-title">Revenue / Activity Overview — last 7 days (from real transaction ledger)</div>
+        <div class="card" id="revenueChart"><div class="empty-row">Loading...</div></div>
 
         <div class="section-title">Recent Withdrawal Requests</div>
         <div class="card table-wrap">
@@ -184,10 +197,10 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
         </div>
       </div>
 
-      <!-- USERS -->
+      <!-- ================= USERS ================= -->
       <div id="admin-page-users" class="admin-page hidden">
         <div class="toolbar">
-          <input type="text" id="userSearchInput" placeholder="Search by name..." style="min-width:220px;" />
+          <input type="text" id="userSearchInput" placeholder="Search by name (prefix match)..." style="min-width:220px;" />
           <button class="btn secondary sm" onclick="searchUsers()">Search</button>
           <button class="btn secondary sm" onclick="clearUserSearch()">Clear</button>
         </div>
@@ -197,20 +210,21 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
             <tbody id="usersTableBody"><tr><td colspan="6" class="empty-row">Loading...</td></tr></tbody>
           </table>
         </div>
+        <div style="text-align:center; margin-top:10px;"><button class="btn secondary" id="loadMoreUsersBtn" onclick="loadMoreUsers()">Load More</button></div>
       </div>
 
-      <!-- TASKS (UPDATE 2: APP INSTALL CONFIGURATION) -->
+      <!-- ================= TASKS ================= -->
       <div id="admin-page-tasks" class="admin-page hidden">
         <div class="toolbar"><button class="btn" onclick="openTaskModal()">+ Create New Task</button></div>
         <div class="card table-wrap">
           <table>
-            <thead><tr><th>Title / App</th><th>Type</th><th>Total Reward</th><th>Daily Reward</th><th>Duration</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody id="tasksTableBody"><tr><td colspan="7" class="empty-row">Loading...</td></tr></tbody>
+            <thead><tr><th>Title</th><th>Type</th><th>Reward</th><th>Cooldown</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="tasksTableBody"><tr><td colspan="6" class="empty-row">Loading...</td></tr></tbody>
           </table>
         </div>
       </div>
 
-      <!-- WITHDRAWALS -->
+      <!-- ================= WITHDRAWALS ================= -->
       <div id="admin-page-withdraw" class="admin-page hidden">
         <div class="tabs">
           <button class="tab-btn active" data-status="pending" onclick="filterWithdraw('pending')">Pending</button>
@@ -219,13 +233,13 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
         </div>
         <div class="card table-wrap">
           <table>
-            <thead><tr><th>User</th><th>Method</th><th>Account</th><th>Amount</th><th>Date</th><th>Actions</th></tr></thead>
-            <tbody id="withdrawTableBody"><tr><td colspan="6" class="empty-row">Loading...</td></tr></tbody>
+            <thead><tr><th>User</th><th>Method</th><th>Account</th><th>Amount</th><th>Date</th><th>Note</th><th>Actions</th></tr></thead>
+            <tbody id="withdrawTableBody"><tr><td colspan="7" class="empty-row">Loading...</td></tr></tbody>
           </table>
         </div>
       </div>
 
-      <!-- REFERRALS -->
+      <!-- ================= REFERRALS ================= -->
       <div id="admin-page-referral" class="admin-page hidden">
         <div class="card">
           <div class="section-title" style="margin-top:0;">Referral Program Settings</div>
@@ -243,16 +257,34 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
         </div>
       </div>
 
-      <!-- NOTIFICATIONS -->
+      <!-- ================= NOTIFICATIONS ================= -->
       <div id="admin-page-notifications" class="admin-page hidden">
         <div class="card">
           <div class="section-title" style="margin-top:0;">Send Notification</div>
-          <div class="field"><label>Message</label><textarea id="notifMessage" placeholder="Write message to all users..."></textarea></div>
-          <button class="btn block" onclick="sendBroadcastNotification()">Send to All Users</button>
+          <div class="field">
+            <label>Target</label>
+            <select id="notifTarget" onchange="toggleNotifTargetUser()">
+              <option value="all">All Users</option>
+              <option value="single">Single User</option>
+            </select>
+          </div>
+          <div class="field hidden" id="notifUserPickWrap">
+            <label>User Email</label>
+            <input type="text" id="notifUserEmail" placeholder="user@example.com" />
+          </div>
+          <div class="field"><label>Message</label><textarea id="notifMessage" placeholder="Write your announcement..."></textarea></div>
+          <div class="field"><label>Schedule (optional — leave blank to send now)</label><input type="datetime-local" id="notifSchedule" /></div>
+          <button class="btn block" onclick="sendNotification()">Send / Schedule</button>
+          <div style="font-size:11px; color:var(--muted); margin-top:8px;">Scheduled announcements require the Cloud Function described in the setup guide to actually dispatch at the chosen time — without it they'll stay queued.</div>
+        </div>
+        <div class="section-title">Scheduled / Sent Announcements</div>
+        <div class="card table-wrap">
+          <table><thead><tr><th>Message</th><th>Target</th><th>Send Time</th><th>Status</th></tr></thead>
+          <tbody id="scheduledTableBody"><tr><td colspan="4" class="empty-row">Loading...</td></tr></tbody></table>
         </div>
       </div>
 
-      <!-- SETTINGS -->
+      <!-- ================= SETTINGS ================= -->
       <div id="admin-page-settings" class="admin-page hidden">
         <form class="card" onsubmit="return saveGlobalSettings(event)">
           <div class="section-title" style="margin-top:0;">Platform Settings</div>
@@ -262,49 +294,84 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
             <select id="setCurrency"><option value="BDT">BDT (৳)</option><option value="USD">USD ($)</option><option value="INR">INR (₹)</option></select>
           </div>
           <div class="toggle-row"><span>Maintenance Mode</span><label class="switch"><input type="checkbox" id="setMaintenanceMode" /><span class="slider-tog"></span></label></div>
+          <div style="font-size:11px; color:var(--muted); margin-top:6px;">When ON, non-admin users are signed out of the app with a maintenance message on their next load.</div>
           <button class="btn block" type="submit">Save Settings</button>
         </form>
       </div>
+
     </div>
   </div>
 </div>
 
-<!-- TASK MODAL -->
+<!-- ---------------- MODALS ---------------- -->
 <div id="taskModal" class="modal-overlay hidden">
   <div class="modal-box">
     <div class="modal-title"><span id="taskModalTitle">Create Task</span><button class="modal-close" onclick="closeModal('taskModal')">✕</button></div>
     <form onsubmit="return saveTask(event)">
       <input type="hidden" id="taskEditId" />
-      <div class="field"><label>Task Title / Display Name</label><input type="text" id="taskTitle" required /></div>
+      <div class="field"><label id="taskTitleLabel">Task Title</label><input type="text" id="taskTitle" required /></div>
       <div class="field"><label>Task Type</label>
-        <select id="taskType" onchange="toggleTaskFields()" required>
-          <option value="app-install">App Install & Check-in</option>
+        <select id="taskType" required onchange="onTaskTypeChange()">
           <option value="video">Video Ad</option>
           <option value="youtube">YouTube Watch</option>
           <option value="facebook">Facebook Follow</option>
           <option value="telegram">Telegram Join</option>
+          <option value="app-install">App Install</option>
+          <option value="daily-bonus">Daily Bonus</option>
         </select>
       </div>
+      <div class="field"><label id="taskRewardLabel">Reward Amount (৳)</label><input type="number" id="taskReward" min="0" step="0.01" required /></div>
 
-      <!-- App Install Specific Fields -->
-      <div id="appInstallFields">
-        <div class="field"><label>App Name</label><input type="text" id="taskAppName" placeholder="e.g. TikTok" /></div>
-        <div class="field"><label>Package Name / Deep Link</label><input type="text" id="taskDeepLink" placeholder="com.zhiliaoapp.musically or tiktok://" /></div>
-        <div class="field"><label>Play Store Link</label><input type="text" id="taskPlayStore" placeholder="https://play.google.com/store/apps/details?id=..." /></div>
-        <div class="field"><label>Check-in Duration (1 to 30 Days)</label><input type="number" id="taskDurationDays" min="1" max="30" value="14" /></div>
-        <div class="field"><label>Daily Reward (optional per check-in)</label><input type="number" id="taskDailyReward" min="0" step="0.01" value="0.50" /></div>
+      <!-- Standard fields — used by every task type EXCEPT App Install -->
+      <div id="standardTaskFields">
+        <div class="field"><label>Cooldown (minutes, 0 = one-time / no cooldown)</label><input type="number" id="taskCooldown" min="0" step="1" value="0" /></div>
+        <div class="field"><label>Target Link (optional)</label><input type="text" id="taskLink" placeholder="https://..." /></div>
       </div>
 
-      <div class="field"><label>Total Completion Reward (৳)</label><input type="number" id="taskReward" min="0" step="0.01" required /></div>
-      <div class="field" id="genericLinkField"><label>Target Link (optional)</label><input type="text" id="taskLink" placeholder="https://..." /></div>
+      <!-- App Install–only fields -->
+      <div id="appInstallTaskFields" class="hidden">
+        <div class="field"><label>Package Name / Deep Link</label><input type="text" id="taskAppDeepLink" placeholder="e.g. com.example.app or myapp://open" /></div>
+        <div class="field"><label>Play Store Link</label><input type="text" id="taskPlayStoreLink" placeholder="https://play.google.com/store/apps/details?id=..." /></div>
+        <div class="field"><label>Check-in Duration (days, 1–30)</label><input type="number" id="taskCheckinDays" min="1" max="30" step="1" value="7" /></div>
+        <div class="field"><label>Daily Reward (optional — paid each day checked in, on top of the Reward Amount above which pays out on the final day)</label><input type="number" id="taskDailyReward" min="0" step="0.01" placeholder="0" /></div>
+      </div>
+
       <div class="field"><label>Description</label><textarea id="taskDescription"></textarea></div>
-      <div class="toggle-row"><span>Task Active</span><label class="switch"><input type="checkbox" id="taskEnabled" checked /><span class="slider-tog"></span></label></div>
+      <div class="toggle-row"><span>Enabled</span><label class="switch"><input type="checkbox" id="taskEnabled" checked /><span class="slider-tog"></span></label></div>
       <button class="btn block" type="submit">Save Task</button>
     </form>
   </div>
 </div>
 
+<div id="balanceModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-title">Adjust Balance<button class="modal-close" onclick="closeModal('balanceModal')">✕</button></div>
+    <form onsubmit="return submitBalanceAdjust(event)">
+      <input type="hidden" id="balanceUserId" />
+      <div style="font-size:13px; color:var(--muted); margin-bottom:10px;" id="balanceUserLabel"></div>
+      <div class="field"><label>Action</label>
+        <select id="balanceAction"><option value="add">Add Balance</option><option value="deduct">Deduct Balance</option></select>
+      </div>
+      <div class="field"><label>Amount (৳)</label><input type="number" id="balanceAmount" min="0.01" step="0.01" required /></div>
+      <div class="field"><label>Reason (visible in user's transaction history)</label><input type="text" id="balanceReason" required placeholder="e.g. Manual bonus adjustment" /></div>
+      <div class="error-text" id="balanceError"></div>
+      <button class="btn block" type="submit">Confirm Adjustment</button>
+    </form>
+  </div>
+</div>
+
+<div id="userDetailModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-title">User Details<button class="modal-close" onclick="closeModal('userDetailModal')">✕</button></div>
+    <div id="userDetailContent"></div>
+  </div>
+</div>
+
 <script>
+/* =====================================================================================
+   FIREBASE CONFIG — use the SAME project/config as the OPULIX user app (index.html)
+===================================================================================== */
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyAyZk5v3jpJ4e7ltx0CdIKaZsPy2p0QXUQ",
   authDomain: "opulix-app.firebaseapp.com",
@@ -320,10 +387,10 @@ const db = firebase.firestore();
 
 let adminUser = null;
 let unsubscribers = [];
-const CURRENCY_SYMBOLS = { BDT:'৳', USD:'$', INR:'₹' };
-let CURRENT_CURRENCY = 'BDT';
 
-function fmtMoney(n){ return (CURRENCY_SYMBOLS[CURRENT_CURRENCY] || '৳') + (n||0).toFixed(2); }
+/* =====================================================================================
+   UI HELPERS
+===================================================================================== */
 function showToast(msg, type='info'){
   const wrap = document.getElementById('toastWrap');
   const t = document.createElement('div'); t.className='toast '+type; t.textContent=msg;
@@ -333,7 +400,13 @@ function showLoading(show){ document.getElementById('loadingOverlay').classList.
 function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
 function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
 function escapeHtml(str){ const d=document.createElement('div'); d.textContent=str||''; return d.innerHTML; }
+const CURRENCY_SYMBOLS = { BDT:'৳', USD:'$', INR:'₹' };
+let CURRENT_CURRENCY = 'BDT'; // overwritten from settings/global before listeners start
+function fmtMoney(n){ return (CURRENCY_SYMBOLS[CURRENT_CURRENCY] || '৳') + (n||0).toFixed(2); }
 
+/* =====================================================================================
+   ADMIN AUTH — only uids present in admins/{uid} may enter
+===================================================================================== */
 async function handleAdminLogin(e){
   e.preventDefault();
   const errEl = document.getElementById('adminLoginError');
@@ -344,16 +417,28 @@ async function handleAdminLogin(e){
   try{
     await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     await auth.signInWithEmailAndPassword(email, password);
+    // onAuthStateChanged handles the admin check + redirect
   }catch(err){
-    errEl.textContent = err.message || 'Login failed';
+    errEl.textContent = friendlyAuthError(err);
     errEl.style.display='block';
   }
   showLoading(false);
   return false;
 }
 
+function friendlyAuthError(err){
+  const map = {
+    'auth/invalid-email':'Please enter a valid email address.',
+    'auth/user-not-found':'No account found with this email.',
+    'auth/wrong-password':'Incorrect password.',
+    'auth/invalid-credential':'Incorrect email or password.',
+    'auth/too-many-requests':'Too many attempts. Please try again later.'
+  };
+  return map[err.code] || (err.message || 'Login failed. Please try again.');
+}
+
 async function handleAdminLogout(){
-  unsubscribers.forEach(u=>u()); unsubscribers = [];
+  detachAll();
   await auth.signOut();
 }
 
@@ -368,119 +453,336 @@ auth.onAuthStateChanged(async (user)=>{
   try{
     const adminDoc = await db.collection('admins').doc(user.uid).get();
     if(!adminDoc.exists){
-      showToast('Unauthorized access.','error');
-      await auth.signOut();
       showLoading(false);
+      showToast('This account is not authorized for admin access.','error');
+      await auth.signOut();
       return;
     }
     adminUser = user;
     document.getElementById('adminLoginScreen').classList.add('hidden');
     document.getElementById('adminShell').classList.remove('hidden');
     document.getElementById('adminEmailDisplay').textContent = user.email;
-    initAdmin();
+    try{
+      const settingsDoc = await db.collection('settings').doc('global').get();
+      if(settingsDoc.exists && settingsDoc.data().currency) CURRENT_CURRENCY = settingsDoc.data().currency;
+    }catch(err){ /* fall back to BDT default if this fails */ }
+    initAllListeners();
   }catch(err){
+    showToast('Failed to verify admin access.','error');
     await auth.signOut();
   }
   showLoading(false);
 });
 
+function detachAll(){ unsubscribers.forEach(u=>u()); unsubscribers = []; }
+
+/* =====================================================================================
+   NAVIGATION
+===================================================================================== */
+const PAGE_TITLES = { dashboard:'Dashboard', users:'User Management', tasks:'Task Management', withdraw:'Withdrawal Management', referral:'Referral Management', notifications:'Notification Management', settings:'Settings' };
 function goAdminPage(page){
   document.querySelectorAll('.admin-page').forEach(p=>p.classList.add('hidden'));
   document.getElementById('admin-page-'+page).classList.remove('hidden');
   document.querySelectorAll('.side-link').forEach(l=>l.classList.toggle('active', l.dataset.page===page));
+  document.getElementById('pageTitle').textContent = PAGE_TITLES[page];
   document.getElementById('sidebar').classList.remove('open');
 }
 
-function initAdmin(){
-  listenDashboard();
-  listenTasks();
-  listenWithdrawals();
-  listenReferrals();
-  listenUsers();
+/* =====================================================================================
+   INIT ALL REALTIME LISTENERS (after admin verified)
+===================================================================================== */
+let allUsersCache = {}; // uid -> user data, built from the dashboard/users listeners
+function initAllListeners(){
+  listenDashboardStats();
+  listenUsersPage();
+  listenTasksPage();
+  listenWithdrawPage();
+  listenReferralPage();
   loadGlobalSettings();
+  listenScheduledNotifications();
 }
 
-function listenDashboard(){
-  const uUnsub = db.collection('users').onSnapshot(snap => {
-    let total = snap.size, active = 0, earnings = 0, pendingW = 0, approvedW = 0;
+/* =====================================================================================
+   DASHBOARD
+===================================================================================== */
+function listenDashboardStats(){
+  const uUnsub = db.collection('users').onSnapshot((snap)=>{
+    let total=0, active=0, earnings=0, pendingW=0, approvedW=0;
     const now = Date.now();
-    snap.forEach(doc => {
+    snap.forEach(doc=>{
       const d = doc.data();
-      earnings += d.totalEarnings || 0;
-      pendingW += d.pendingWithdraw || 0;
-      approvedW += d.totalWithdrawn || 0;
-      const last = d.lastCheckin ? d.lastCheckin.toMillis() : 0;
-      if(now - last < 7*86400000) active++;
+      allUsersCache[doc.id] = d;
+      total++;
+      earnings += d.totalEarnings||0;
+      pendingW += d.pendingWithdraw||0;
+      approvedW += d.totalWithdrawn||0;
+      const last = d.lastCheckin ? d.lastCheckin.toMillis() : (d.createdAt ? d.createdAt.toMillis() : 0);
+      if(now - last < 7*24*60*60*1000) active++;
     });
     document.getElementById('statTotalUsers').textContent = total;
     document.getElementById('statActiveUsers').textContent = active;
     document.getElementById('statTotalEarnings').textContent = fmtMoney(earnings);
     document.getElementById('statPendingWithdraw').textContent = fmtMoney(pendingW);
     document.getElementById('statApprovedWithdraw').textContent = fmtMoney(approvedW);
-  });
+  }, err=>console.error(err));
   unsubscribers.push(uUnsub);
 
-  const rUnsub = db.collection('referrals').onSnapshot(snap => {
-    document.getElementById('statTotalReferrals').textContent = snap.size;
+  // "Tasks Completed" merges two collections: completedTasks (all non-app-install task
+  // types) and appInstallProgress (only docs whose check-in streak reached "completed").
+  let lastCompletedTasksCount = 0, lastCompletedInstallsCount = 0;
+  function updateTasksCompletedStat(){
+    document.getElementById('statTasksCompleted').textContent = lastCompletedTasksCount + lastCompletedInstallsCount;
+  }
+  const ctUnsub = db.collection('completedTasks').onSnapshot((snap)=>{
+    lastCompletedTasksCount = snap.size;
+    updateTasksCompletedStat();
   });
-  unsubscribers.push(rUnsub);
+  unsubscribers.push(ctUnsub);
+  const aipUnsub = db.collection('appInstallProgress').onSnapshot((snap)=>{
+    lastCompletedInstallsCount = snap.docs.filter(d=>d.data().status === 'completed').length;
+    updateTasksCompletedStat();
+  });
+  unsubscribers.push(aipUnsub);
 
-  const wUnsub = db.collection('withdrawRequests').orderBy('createdAt','desc').limit(8).onSnapshot(snap => {
+  const refUnsub = db.collection('referrals').onSnapshot((snap)=>{
+    let payouts = 0;
+    snap.forEach(doc=>{ payouts += doc.data().referrerBonus || 0; });
+    document.getElementById('statTotalReferrals').textContent = snap.size;
+    document.getElementById('statReferralPayouts').textContent = fmtMoney(payouts);
+  });
+  unsubscribers.push(refUnsub);
+
+  const wdUnsub = db.collection('withdrawRequests').orderBy('createdAt','desc').limit(8).onSnapshot((snap)=>{
     const body = document.getElementById('dashRecentWithdrawals');
-    if(snap.empty){ body.innerHTML = '<tr><td colspan="4" class="empty-row">No requests</td></tr>'; return; }
+    if(snap.empty){ body.innerHTML = '<tr><td colspan="4" class="empty-row">No withdrawal requests yet</td></tr>'; return; }
     let html = '';
-    snap.forEach(doc => {
+    snap.forEach(doc=>{
       const w = doc.data();
-      html += `<tr><td>${escapeHtml(w.uid).slice(0,8)}...</td><td>${w.method}</td><td>${fmtMoney(w.amount)}</td><td><span class="pill ${w.status}">${w.status}</span></td></tr>`;
+      html += `<tr><td>${escapeHtml(w.uid).slice(0,10)}...</td><td>${w.method}</td><td>${fmtMoney(w.amount)}</td><td><span class="pill ${w.status}">${w.status}</span></td></tr>`;
     });
     body.innerHTML = html;
   });
-  unsubscribers.push(wUnsub);
+  unsubscribers.push(wdUnsub);
+
+  const txUnsub = db.collection('transactions').orderBy('createdAt','desc').limit(300).onSnapshot((snap)=>{
+    renderRevenueChart(snap);
+  });
+  unsubscribers.push(txUnsub);
 }
 
-function toggleTaskFields(){
-  const type = document.getElementById('taskType').value;
-  const isApp = type === 'app-install';
-  document.getElementById('appInstallFields').classList.toggle('hidden', !isApp);
-  document.getElementById('genericLinkField').classList.toggle('hidden', isApp);
+function renderRevenueChart(snap){
+  const days = {};
+  const labels = [];
+  for(let i=6;i>=0;i--){
+    const d = new Date(Date.now() - i*86400000);
+    const key = d.toISOString().slice(0,10);
+    days[key] = { credit:0, debit:0 };
+    labels.push(key);
+  }
+  snap.forEach(doc=>{
+    const t = doc.data();
+    if(!t.createdAt) return;
+    const key = t.createdAt.toDate().toISOString().slice(0,10);
+    if(days[key]){
+      if(t.type==='credit') days[key].credit += t.amount;
+      else days[key].debit += t.amount;
+    }
+  });
+  const maxVal = Math.max(1, ...labels.map(k=>Math.max(days[k].credit, days[k].debit)));
+  let html = '';
+  labels.forEach(key=>{
+    const c = days[key].credit, dbt = days[key].debit;
+    const label = key.slice(5);
+    html += `<div class="bar-row"><span class="bar-label">${label}</span><div class="bar-track"><div class="bar-fill" style="width:${(c/maxVal*100).toFixed(1)}%"></div></div><span class="bar-val">+${fmtMoney(c)}</span></div>`;
+    html += `<div class="bar-row"><span class="bar-label"></span><div class="bar-track"><div class="bar-fill" style="width:${(dbt/maxVal*100).toFixed(1)}%; background:linear-gradient(90deg,var(--danger),var(--warn));"></div></div><span class="bar-val">-${fmtMoney(dbt)}</span></div>`;
+  });
+  document.getElementById('revenueChart').innerHTML = html || '<div class="empty-row">No transactions yet</div>';
 }
 
-function openTaskModal(){
-  document.getElementById('taskModalTitle').textContent = 'Create Task';
-  document.getElementById('taskEditId').value = '';
-  document.getElementById('taskTitle').value = '';
-  document.getElementById('taskType').value = 'app-install';
-  document.getElementById('taskAppName').value = '';
-  document.getElementById('taskDeepLink').value = '';
-  document.getElementById('taskPlayStore').value = '';
-  document.getElementById('taskDurationDays').value = '14';
-  document.getElementById('taskDailyReward').value = '0.50';
-  document.getElementById('taskReward').value = '10.00';
-  document.getElementById('taskLink').value = '';
-  document.getElementById('taskDescription').value = '';
-  document.getElementById('taskEnabled').checked = true;
-  toggleTaskFields();
-  openModal('taskModal');
+/* =====================================================================================
+   USER MANAGEMENT
+===================================================================================== */
+let usersLastDoc = null;
+let usersSearchMode = false;
+
+function listenUsersPage(){
+  loadUsersPage(true);
 }
 
-function listenTasks(){
-  const unsub = db.collection('tasks').orderBy('createdAt','desc').onSnapshot(snap => {
+async function loadUsersPage(reset){
+  if(reset){ usersLastDoc = null; document.getElementById('usersTableBody').innerHTML = ''; }
+  let q = db.collection('users').orderBy('createdAt','desc').limit(25);
+  if(usersLastDoc) q = q.startAfter(usersLastDoc);
+  const snap = await q.get();
+  if(snap.empty && reset){ document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="6" class="empty-row">No users yet</td></tr>'; return; }
+  snap.docs.forEach(doc=> appendUserRow(doc.id, doc.data()));
+  if(!snap.empty) usersLastDoc = snap.docs[snap.docs.length-1];
+  document.getElementById('loadMoreUsersBtn').style.display = snap.size < 25 ? 'none' : 'inline-block';
+}
+function loadMoreUsers(){ loadUsersPage(false); }
+
+function appendUserRow(uid, d){
+  const body = document.getElementById('usersTableBody');
+  const avatar = d.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(d.name||'U')}`;
+  const joined = d.createdAt ? d.createdAt.toDate().toLocaleDateString() : '—';
+  const banned = d.banned === true;
+  const row = document.createElement('tr');
+  row.id = 'user-row-'+uid;
+  row.innerHTML = `
+    <td><img class="mini-avatar" src="${avatar}"/>${escapeHtml(d.name||'—')}<br><span style="color:var(--muted); font-size:11px;">${escapeHtml(d.email||'')}</span></td>
+    <td>${fmtMoney(d.balance)}</td>
+    <td>${fmtMoney(d.totalEarnings)}</td>
+    <td><span class="pill ${banned?'banned':'active'}">${banned?'Banned':'Active'}</span></td>
+    <td>${joined}</td>
+    <td style="white-space:nowrap;">
+      <button class="btn sm secondary" onclick="viewUserDetail('${uid}')">View</button>
+      <button class="btn sm secondary" onclick="openBalanceModal('${uid}','${escapeHtml(d.name||'')}')">Balance</button>
+      <button class="btn sm ${banned?'ok':'danger'}" onclick="toggleBan('${uid}', ${!banned})">${banned?'Unban':'Ban'}</button>
+    </td>`;
+  body.appendChild(row);
+}
+
+async function toggleBan(uid, newStatus){
+  showLoading(true);
+  try{
+    await db.collection('users').doc(uid).update({ banned: newStatus });
+    await addNotification(uid, newStatus ? 'Your account has been suspended by an administrator.' : 'Your account has been reinstated.');
+    showToast(newStatus ? 'User banned.' : 'User unbanned.', 'success');
+    const badgeCell = document.querySelector(`#user-row-${uid} .pill`);
+    if(badgeCell){ badgeCell.textContent = newStatus?'Banned':'Active'; badgeCell.className = 'pill ' + (newStatus?'banned':'active'); }
+    const btn = document.querySelector(`#user-row-${uid} .btn.danger, #user-row-${uid} .btn.ok`);
+    if(btn){ btn.textContent = newStatus?'Unban':'Ban'; btn.className = 'btn sm ' + (newStatus?'ok':'danger'); btn.setAttribute('onclick', `toggleBan('${uid}', ${!newStatus})`); }
+  }catch(err){ showToast('Failed to update ban status.','error'); }
+  showLoading(false);
+}
+
+async function searchUsers(){
+  const term = document.getElementById('userSearchInput').value.trim();
+  if(!term){ return; }
+  usersSearchMode = true;
+  document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="6" class="empty-row">Searching...</td></tr>';
+  document.getElementById('loadMoreUsersBtn').style.display = 'none';
+  try{
+    const snap = await db.collection('users').orderBy('name').startAt(term).endAt(term+'\uf8ff').limit(25).get();
+    document.getElementById('usersTableBody').innerHTML = '';
+    if(snap.empty){ document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="6" class="empty-row">No matching users (name is case-sensitive prefix match)</td></tr>'; return; }
+    snap.forEach(doc=> appendUserRow(doc.id, doc.data()));
+  }catch(err){ showToast('Search failed.','error'); }
+}
+function clearUserSearch(){
+  usersSearchMode = false;
+  document.getElementById('userSearchInput').value = '';
+  loadUsersPage(true);
+  document.getElementById('loadMoreUsersBtn').style.display = 'inline-block';
+}
+
+function openBalanceModal(uid, name){
+  document.getElementById('balanceUserId').value = uid;
+  document.getElementById('balanceUserLabel').textContent = 'Adjusting balance for: ' + name;
+  document.getElementById('balanceAmount').value = '';
+  document.getElementById('balanceReason').value = '';
+  document.getElementById('balanceError').style.display = 'none';
+  openModal('balanceModal');
+}
+
+async function submitBalanceAdjust(e){
+  e.preventDefault();
+  const uid = document.getElementById('balanceUserId').value;
+  const action = document.getElementById('balanceAction').value;
+  const amount = parseFloat(document.getElementById('balanceAmount').value);
+  const reason = document.getElementById('balanceReason').value.trim();
+  const errEl = document.getElementById('balanceError');
+  errEl.style.display = 'none';
+  if(isNaN(amount) || amount <= 0){ errEl.textContent='Enter a valid amount.'; errEl.style.display='block'; return false; }
+
+  showLoading(true);
+  try{
+    const delta = action === 'add' ? amount : -amount;
+    const userRef = db.collection('users').doc(uid);
+    await db.runTransaction(async (tx)=>{
+      const snap = await tx.get(userRef);
+      const bal = snap.data().balance || 0;
+      if(action === 'deduct' && bal < amount) throw new Error('INSUFFICIENT');
+      const update = { balance: firebase.firestore.FieldValue.increment(delta) };
+      if(action === 'add') update.totalEarnings = firebase.firestore.FieldValue.increment(amount);
+      tx.update(userRef, update);
+    });
+    await addTransaction(uid, `Admin adjustment: ${reason}`, amount, action==='add'?'credit':'debit');
+    await addNotification(uid, `An admin ${action==='add'?'added':'deducted'} ${fmtMoney(amount)} to/from your balance. Reason: ${reason}`);
+    showToast('Balance updated.','success');
+    closeModal('balanceModal');
+  }catch(err){
+    if(err.message === 'INSUFFICIENT'){ errEl.textContent = 'User balance is lower than the deduction amount.'; errEl.style.display='block'; }
+    else { showToast('Failed to adjust balance.','error'); }
+  }
+  showLoading(false);
+  return false;
+}
+
+async function viewUserDetail(uid){
+  showLoading(true);
+  try{
+    const userDoc = await db.collection('users').doc(uid).get();
+    const d = userDoc.data();
+    const [txSnap, completedSnap, installSnap] = await Promise.all([
+      db.collection('transactions').where('uid','==',uid).orderBy('createdAt','desc').limit(15).get(),
+      db.collection('completedTasks').where('uid','==',uid).get(), // equality-only filter, no composite index needed
+      db.collection('appInstallProgress').where('uid','==',uid).get() // equality-only filter, no composite index needed
+    ]);
+    let txHtml = '<div class="empty-row">No transactions</div>';
+    if(!txSnap.empty){
+      txHtml = '<table><thead><tr><th>Label</th><th>Amount</th><th>Date</th></tr></thead><tbody>';
+      txSnap.forEach(doc=>{
+        const t = doc.data();
+        const cls = t.type==='credit' ? 'style="color:var(--ok)"' : 'style="color:var(--danger)"';
+        txHtml += `<tr><td>${escapeHtml(t.label)}</td><td ${cls}>${t.type==='credit'?'+':'-'}${fmtMoney(t.amount)}</td><td>${t.createdAt?t.createdAt.toDate().toLocaleString():''}</td></tr>`;
+      });
+      txHtml += '</tbody></table>';
+    }
+    // Count only genuinely completed items across BOTH collections: regular one-time/repeatable
+    // tasks (completedTasks) always count once they exist here; App Install tasks live in
+    // appInstallProgress and only count once their check-in streak reaches status "completed".
+    let completedCount = 0;
+    completedSnap.forEach(doc=> completedCount++);
+    installSnap.forEach(doc=>{ if(doc.data().status === 'completed') completedCount++; });
+    document.getElementById('userDetailContent').innerHTML = `
+      <div class="grid" style="margin-bottom:16px;">
+        <div class="stat-box"><div class="stat-label">Name</div><div class="stat-value" style="font-size:15px;">${escapeHtml(d.name)}</div></div>
+        <div class="stat-box"><div class="stat-label">Phone</div><div class="stat-value" style="font-size:15px;">${escapeHtml(d.phone||'—')}</div></div>
+        <div class="stat-box"><div class="stat-label">Balance</div><div class="stat-value accent">${fmtMoney(d.balance)}</div></div>
+        <div class="stat-box"><div class="stat-label">Referral Code</div><div class="stat-value" style="font-size:14px;">${escapeHtml(d.referralCode||'—')}</div></div>
+        <div class="stat-box"><div class="stat-label">Completed Tasks</div><div class="stat-value">${completedCount}</div></div>
+        <div class="stat-box"><div class="stat-label">Total Earnings</div><div class="stat-value">${fmtMoney(d.totalEarnings)}</div></div>
+      </div>
+      <div class="section-title" style="margin-top:0;">Recent Transactions (Activity History)</div>
+      ${txHtml}
+    `;
+    openModal('userDetailModal');
+  }catch(err){
+    console.error('viewUserDetail error:', err);
+    showToast('Failed to load user details — check the browser console (often a missing Firestore index).','error');
+  }
+  showLoading(false);
+}
+
+/* =====================================================================================
+   TASK MANAGEMENT
+===================================================================================== */
+function listenTasksPage(){
+  const unsub = db.collection('tasks').orderBy('createdAt','desc').onSnapshot((snap)=>{
     const body = document.getElementById('tasksTableBody');
-    if(snap.empty){ body.innerHTML = '<tr><td colspan="7" class="empty-row">No tasks configured</td></tr>'; return; }
+    if(snap.empty){ body.innerHTML = '<tr><td colspan="6" class="empty-row">No tasks created yet</td></tr>'; return; }
     let html = '';
-    snap.forEach(doc => {
+    snap.forEach(doc=>{
       const t = doc.data();
-      const dur = t.type === 'app-install' ? `${t.durationDays || 14} Days` : 'N/A';
-      const daily = t.type === 'app-install' ? fmtMoney(t.dailyReward || 0) : '—';
       html += `<tr>
-        <td>${escapeHtml(t.appName || t.title)}</td>
-        <td>${t.type}</td>
+        <td>${escapeHtml(t.title)}</td>
+        <td>${escapeHtml(t.type)}</td>
         <td>${fmtMoney(t.reward)}</td>
-        <td>${daily}</td>
-        <td>${dur}</td>
-        <td><span class="pill ${t.enabled?'active':'banned'}">${t.enabled?'Active':'Inactive'}</span></td>
-        <td>
-          <button class="btn sm secondary" onclick="editTask('${doc.id}')">Edit</button>
+        <td>${t.type==='app-install' ? (t.checkinDays||0)+'-day check-in' : (t.cooldownMinutes>0 ? t.cooldownMinutes+' min' : 'One-time')}</td>
+        <td><span class="pill ${t.enabled?'active':'banned'}">${t.enabled?'Enabled':'Disabled'}</span></td>
+        <td style="white-space:nowrap;">
+          <button class="btn sm secondary" onclick='editTask("${doc.id}")'>Edit</button>
           <button class="btn sm danger" onclick="deleteTask('${doc.id}')">Delete</button>
         </td>
       </tr>`;
@@ -490,224 +792,344 @@ function listenTasks(){
   unsubscribers.push(unsub);
 }
 
-async function editTask(id){
-  const snap = await db.collection('tasks').doc(id).get();
-  const t = snap.data();
-  document.getElementById('taskModalTitle').textContent = 'Edit Task';
-  document.getElementById('taskEditId').value = id;
-  document.getElementById('taskTitle').value = t.title || '';
-  document.getElementById('taskType').value = t.type || 'app-install';
-  document.getElementById('taskAppName').value = t.appName || '';
-  document.getElementById('taskDeepLink').value = t.deepLink || '';
-  document.getElementById('taskPlayStore').value = t.playStoreLink || '';
-  document.getElementById('taskDurationDays').value = t.durationDays || 14;
-  document.getElementById('taskDailyReward').value = t.dailyReward || 0;
-  document.getElementById('taskReward').value = t.reward || 0;
-  document.getElementById('taskLink').value = t.link || '';
-  document.getElementById('taskDescription').value = t.description || '';
-  document.getElementById('taskEnabled').checked = !!t.enabled;
-  toggleTaskFields();
+let taskCache = {};
+function onTaskTypeChange(){
+  const isAppInstall = document.getElementById('taskType').value === 'app-install';
+  document.getElementById('standardTaskFields').classList.toggle('hidden', isAppInstall);
+  document.getElementById('appInstallTaskFields').classList.toggle('hidden', !isAppInstall);
+  document.getElementById('taskTitleLabel').textContent = isAppInstall ? 'App Name' : 'Task Title';
+  document.getElementById('taskRewardLabel').textContent = isAppInstall ? 'Reward Amount — paid on final day (৳)' : 'Reward Amount (৳)';
+}
+function openTaskModal(){
+  document.getElementById('taskModalTitle').textContent = 'Create Task';
+  document.getElementById('taskEditId').value = '';
+  document.getElementById('taskTitle').value = '';
+  document.getElementById('taskType').value = 'video';
+  document.getElementById('taskReward').value = '';
+  document.getElementById('taskCooldown').value = 0;
+  document.getElementById('taskLink').value = '';
+  document.getElementById('taskAppDeepLink').value = '';
+  document.getElementById('taskPlayStoreLink').value = '';
+  document.getElementById('taskCheckinDays').value = 7;
+  document.getElementById('taskDailyReward').value = '';
+  document.getElementById('taskDescription').value = '';
+  document.getElementById('taskEnabled').checked = true;
+  onTaskTypeChange();
   openModal('taskModal');
 }
-
+async function editTask(id){
+  showLoading(true);
+  try{
+    const doc = await db.collection('tasks').doc(id).get();
+    const t = doc.data();
+    document.getElementById('taskModalTitle').textContent = 'Edit Task';
+    document.getElementById('taskEditId').value = id;
+    document.getElementById('taskTitle').value = t.title;
+    document.getElementById('taskType').value = t.type;
+    document.getElementById('taskReward').value = t.reward;
+    document.getElementById('taskCooldown').value = t.cooldownMinutes || 0;
+    document.getElementById('taskLink').value = t.link||'';
+    document.getElementById('taskAppDeepLink').value = t.appDeepLink||'';
+    document.getElementById('taskPlayStoreLink').value = t.playStoreLink||'';
+    document.getElementById('taskCheckinDays').value = t.checkinDays || 7;
+    document.getElementById('taskDailyReward').value = t.dailyReward || '';
+    document.getElementById('taskDescription').value = t.description||'';
+    document.getElementById('taskEnabled').checked = !!t.enabled;
+    onTaskTypeChange();
+    openModal('taskModal');
+  }catch(err){ showToast('Failed to load task.','error'); }
+  showLoading(false);
+}
 async function saveTask(e){
   e.preventDefault();
   const id = document.getElementById('taskEditId').value;
   const type = document.getElementById('taskType').value;
   const data = {
     title: document.getElementById('taskTitle').value.trim(),
-    type: type,
-    reward: parseFloat(document.getElementById('taskReward').value) || 0,
+    type,
+    reward: parseFloat(document.getElementById('taskReward').value),
     description: document.getElementById('taskDescription').value.trim(),
     enabled: document.getElementById('taskEnabled').checked
   };
-
   if(type === 'app-install'){
-    data.appName = document.getElementById('taskAppName').value.trim();
-    data.deepLink = document.getElementById('taskDeepLink').value.trim();
-    data.playStoreLink = document.getElementById('taskPlayStore').value.trim();
-    data.durationDays = parseInt(document.getElementById('taskDurationDays').value, 10) || 14;
-    data.dailyReward = parseFloat(document.getElementById('taskDailyReward').value) || 0;
+    const checkinDays = Math.min(30, Math.max(1, parseInt(document.getElementById('taskCheckinDays').value,10) || 1));
+    data.appDeepLink = document.getElementById('taskAppDeepLink').value.trim();
+    data.playStoreLink = document.getElementById('taskPlayStoreLink').value.trim();
+    data.checkinDays = checkinDays;
+    const dailyRewardVal = document.getElementById('taskDailyReward').value;
+    data.dailyReward = dailyRewardVal ? parseFloat(dailyRewardVal) : 0;
+    data.cooldownMinutes = 0;
+    data.link = '';
   } else {
+    data.cooldownMinutes = parseInt(document.getElementById('taskCooldown').value,10) || 0;
     data.link = document.getElementById('taskLink').value.trim();
+    data.appDeepLink = '';
+    data.playStoreLink = '';
+    data.checkinDays = 0;
+    data.dailyReward = 0;
   }
-
   showLoading(true);
   try{
     if(id){
       await db.collection('tasks').doc(id).update(data);
-    } else {
+      showToast('Task updated.','success');
+    }else{
       data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
       await db.collection('tasks').add(data);
+      showToast('Task created.','success');
     }
     closeModal('taskModal');
-    showToast('Task saved successfully.','success');
-  }catch(err){
-    showToast('Error saving task.','error');
-  }
+  }catch(err){ showToast('Failed to save task.','error'); }
   showLoading(false);
   return false;
 }
-
 async function deleteTask(id){
-  if(!confirm('Are you sure you want to delete this task?')) return;
-  await db.collection('tasks').doc(id).delete();
-  showToast('Task deleted.','success');
+  if(!confirm('Delete this task? This cannot be undone.')) return;
+  showLoading(true);
+  try{ await db.collection('tasks').doc(id).delete(); showToast('Task deleted.','success'); }
+  catch(err){ showToast('Failed to delete task.','error'); }
+  showLoading(false);
 }
 
-/* USERS */
-function listenUsers(){
-  db.collection('users').orderBy('createdAt','desc').limit(50).onSnapshot(snap=>{
-    const body = document.getElementById('usersTableBody');
-    if(snap.empty){ body.innerHTML = '<tr><td colspan="6" class="empty-row">No users</td></tr>'; return; }
-    let html = '';
-    snap.forEach(doc => {
-      const d = doc.data();
-      const banned = d.banned === true;
-      html += `<tr>
-        <td>${escapeHtml(d.name || 'User')}<br><span style="color:var(--muted);font-size:11px;">${escapeHtml(d.email)}</span></td>
-        <td>${fmtMoney(d.balance)}</td>
-        <td>${fmtMoney(d.totalEarnings)}</td>
-        <td><span class="pill ${banned?'banned':'active'}">${banned?'Banned':'Active'}</span></td>
-        <td>${d.createdAt ? d.createdAt.toDate().toLocaleDateString() : '—'}</td>
-        <td><button class="btn sm ${banned?'ok':'danger'}" onclick="toggleBan('${doc.id}', ${!banned})">${banned?'Unban':'Ban'}</button></td>
-      </tr>`;
-    });
-    body.innerHTML = html;
-  });
-}
-
-async function toggleBan(uid, status){
-  await db.collection('users').doc(uid).update({ banned: status });
-  showToast(status ? 'User banned.' : 'User unbanned.', 'success');
-}
-
-/* WITHDRAWALS */
-let withdrawFilter = 'pending';
-function filterWithdraw(st){
-  withdrawFilter = st;
-  document.querySelectorAll('#admin-page-withdraw .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.status===st));
+/* =====================================================================================
+   WITHDRAWAL MANAGEMENT
+===================================================================================== */
+let currentWithdrawFilter = 'pending';
+function filterWithdraw(status){
+  currentWithdrawFilter = status;
+  document.querySelectorAll('#admin-page-withdraw .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.status===status));
   renderWithdrawTable();
 }
-let withdrawDataCache = [];
-function listenWithdrawals(){
-  db.collection('withdrawRequests').orderBy('createdAt','desc').onSnapshot(snap => {
-    withdrawDataCache = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+let allWithdrawCache = [];
+function listenWithdrawPage(){
+  const unsub = db.collection('withdrawRequests').orderBy('createdAt','desc').onSnapshot((snap)=>{
+    allWithdrawCache = snap.docs.map(d=>({ id:d.id, ...d.data() }));
     renderWithdrawTable();
   });
+  unsubscribers.push(unsub);
 }
 function renderWithdrawTable(){
   const body = document.getElementById('withdrawTableBody');
-  const filtered = withdrawDataCache.filter(w=>w.status===withdrawFilter);
-  if(filtered.length === 0){ body.innerHTML = `<tr><td colspan="6" class="empty-row">No ${withdrawFilter} requests</td></tr>`; return; }
+  const filtered = allWithdrawCache.filter(w=>w.status===currentWithdrawFilter);
+  if(filtered.length === 0){ body.innerHTML = `<tr><td colspan="7" class="empty-row">No ${currentWithdrawFilter} requests</td></tr>`; return; }
   let html = '';
   filtered.forEach(w=>{
-    let actions = w.status === 'pending'
-      ? `<button class="btn sm ok" onclick="approveW('${w.id}')">Approve</button> <button class="btn sm danger" onclick="rejectW('${w.id}')">Reject</button>`
-      : `<span style="color:var(--muted);font-size:11px;">Processed</span>`;
-    html += `<tr><td>${w.uid.slice(0,8)}...</td><td>${w.method}</td><td>${escapeHtml(w.account)}</td><td>${fmtMoney(w.amount)}</td><td>${w.createdAt?w.createdAt.toDate().toLocaleDateString():'—'}</td><td>${actions}</td></tr>`;
+    const uinfo = allUsersCache[w.uid];
+    const uname = uinfo ? uinfo.name : w.uid.slice(0,10)+'...';
+    const date = w.createdAt ? w.createdAt.toDate().toLocaleString() : '—';
+    let actions = '';
+    if(w.status === 'pending'){
+      actions = `<button class="btn sm ok" onclick="approveWithdraw('${w.id}')">Approve</button> <button class="btn sm danger" onclick="rejectWithdraw('${w.id}')">Reject</button>`;
+    } else {
+      actions = `<span style="color:var(--muted); font-size:11px;">Processed</span>`;
+    }
+    html += `<tr><td>${escapeHtml(uname)}</td><td>${w.method}</td><td>${escapeHtml(w.account)}</td><td>${fmtMoney(w.amount)}</td><td>${date}</td><td>${escapeHtml(w.adminNote||'—')}</td><td>${actions}</td></tr>`;
   });
   body.innerHTML = html;
 }
 
-async function approveW(id){
-  const snap = await db.collection('withdrawRequests').doc(id).get();
-  const w = snap.data();
-  await db.runTransaction(async tx => {
-    tx.update(db.collection('users').doc(w.uid), {
-      pendingWithdraw: firebase.firestore.FieldValue.increment(-w.amount),
-      totalWithdrawn: firebase.firestore.FieldValue.increment(w.amount)
+async function approveWithdraw(id){
+  if(!confirm('Approve this withdrawal request?')) return;
+  showLoading(true);
+  try{
+    const wRef = db.collection('withdrawRequests').doc(id);
+    const wSnap = await wRef.get();
+    const w = wSnap.data();
+    await db.runTransaction(async (tx)=>{
+      const userRef = db.collection('users').doc(w.uid);
+      tx.update(userRef, {
+        pendingWithdraw: firebase.firestore.FieldValue.increment(-w.amount),
+        totalWithdrawn: firebase.firestore.FieldValue.increment(w.amount)
+      });
+      tx.update(wRef, { status:'approved', adminNote: 'Approved', processedAt: firebase.firestore.FieldValue.serverTimestamp(), processedBy: adminUser.email });
     });
-    tx.update(db.collection('withdrawRequests').doc(id), { status:'approved' });
-  });
-  showToast('Approved!','success');
+    await addTransaction(w.uid, `Withdraw approved (${w.method})`, w.amount, 'debit');
+    await addNotification(w.uid, `Your withdrawal of ${fmtMoney(w.amount)} has been approved and processed.`);
+    showToast('Withdrawal approved.','success');
+  }catch(err){ showToast('Failed to approve withdrawal.','error'); }
+  showLoading(false);
 }
 
-async function rejectW(id){
-  const snap = await db.collection('withdrawRequests').doc(id).get();
-  const w = snap.data();
-  await db.runTransaction(async tx => {
-    tx.update(db.collection('users').doc(w.uid), {
-      balance: firebase.firestore.FieldValue.increment(w.amount),
-      pendingWithdraw: firebase.firestore.FieldValue.increment(-w.amount)
+async function rejectWithdraw(id){
+  const reason = prompt('Reason for rejecting this withdrawal (shown to the user):');
+  if(reason === null) return;
+  showLoading(true);
+  try{
+    const wRef = db.collection('withdrawRequests').doc(id);
+    const wSnap = await wRef.get();
+    const w = wSnap.data();
+    await db.runTransaction(async (tx)=>{
+      const userRef = db.collection('users').doc(w.uid);
+      tx.update(userRef, {
+        balance: firebase.firestore.FieldValue.increment(w.amount),
+        pendingWithdraw: firebase.firestore.FieldValue.increment(-w.amount)
+      });
+      tx.update(wRef, { status:'rejected', adminNote: reason || 'Rejected', processedAt: firebase.firestore.FieldValue.serverTimestamp(), processedBy: adminUser.email });
     });
-    tx.update(db.collection('withdrawRequests').doc(id), { status:'rejected' });
-  });
-  showToast('Rejected & refunded.','info');
+    await addTransaction(w.uid, `Withdraw rejected — refunded (${w.method})`, w.amount, 'credit');
+    await addNotification(w.uid, `Your withdrawal of ${fmtMoney(w.amount)} was rejected. Reason: ${reason||'Not specified'}. The amount has been refunded to your balance.`);
+    showToast('Withdrawal rejected and refunded.','info');
+  }catch(err){ showToast('Failed to reject withdrawal.','error'); }
+  showLoading(false);
 }
 
-/* REFERRALS */
-function listenReferrals(){
-  db.collection('referrals').orderBy('createdAt','desc').limit(50).onSnapshot(snap => {
+/* =====================================================================================
+   REFERRAL MANAGEMENT
+===================================================================================== */
+function listenReferralPage(){
+  const unsub = db.collection('referrals').orderBy('createdAt','desc').limit(50).onSnapshot((snap)=>{
     const body = document.getElementById('referralsTableBody');
-    if(snap.empty){ body.innerHTML = '<tr><td colspan="4" class="empty-row">No referrals</td></tr>'; return; }
+    if(snap.empty){ body.innerHTML = '<tr><td colspan="4" class="empty-row">No referrals yet</td></tr>'; return; }
     let html = '';
-    snap.forEach(doc => {
+    snap.forEach(doc=>{
       const r = doc.data();
-      html += `<tr><td>${escapeHtml(r.referrerUid).slice(0,8)}...</td><td>${escapeHtml(r.referredName||'User')}</td><td>${fmtMoney(r.referrerBonus)}</td><td>${r.createdAt?r.createdAt.toDate().toLocaleDateString():'—'}</td></tr>`;
+      const date = r.createdAt ? r.createdAt.toDate().toLocaleString() : '—';
+      html += `<tr><td>${escapeHtml((allUsersCache[r.referrerUid]||{}).name || r.referrerUid.slice(0,10)+'...')}</td><td>${escapeHtml(r.referredName||'—')}</td><td>${fmtMoney(r.referrerBonus)}</td><td>${date}</td></tr>`;
     });
     body.innerHTML = html;
   });
+  unsubscribers.push(unsub);
 
-  db.collection('settings').doc('global').get().then(doc => {
+  db.collection('settings').doc('global').get().then(doc=>{
     if(doc.exists){
       const s = doc.data();
       document.getElementById('referralEnabledToggle').checked = s.referralEnabled !== false;
       document.getElementById('referrerBonusInput').value = s.referrerBonus ?? 5.00;
       document.getElementById('referredBonusInput').value = s.referredBonus ?? 2.00;
+    } else {
+      document.getElementById('referralEnabledToggle').checked = true;
+      document.getElementById('referrerBonusInput').value = 5.00;
+      document.getElementById('referredBonusInput').value = 2.00;
     }
   });
 }
-
 async function saveReferralSettings(){
-  await db.collection('settings').doc('global').set({
-    referralEnabled: document.getElementById('referralEnabledToggle').checked,
-    referrerBonus: parseFloat(document.getElementById('referrerBonusInput').value) || 0,
-    referredBonus: parseFloat(document.getElementById('referredBonusInput').value) || 0
-  }, { merge: true });
-  showToast('Referral settings updated.','success');
-}
-
-/* NOTIFICATIONS */
-async function sendBroadcastNotification(){
-  const msg = document.getElementById('notifMessage').value.trim();
-  if(!msg) return;
   showLoading(true);
-  const snap = await db.collection('users').get();
-  const batch = db.batch();
-  snap.forEach(d => {
-    const ref = db.collection('notifications').doc();
-    batch.set(ref, { uid: d.id, message: msg, read: false, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-  });
-  await batch.commit();
-  document.getElementById('notifMessage').value = '';
-  showToast('Broadcast sent.','success');
+  try{
+    await db.collection('settings').doc('global').set({
+      referralEnabled: document.getElementById('referralEnabledToggle').checked,
+      referrerBonus: parseFloat(document.getElementById('referrerBonusInput').value) || 0,
+      referredBonus: parseFloat(document.getElementById('referredBonusInput').value) || 0
+    }, { merge:true });
+    showToast('Referral settings saved.','success');
+  }catch(err){ showToast('Failed to save referral settings.','error'); }
   showLoading(false);
 }
 
-/* SETTINGS */
-function loadGlobalSettings(){
-  db.collection('settings').doc('global').get().then(doc => {
-    if(doc.exists){
-      const s = doc.data();
-      document.getElementById('setMinWithdraw').value = s.minWithdraw ?? 100;
-      document.getElementById('setDailyBonus').value = s.dailyBonusAmount ?? 1.00;
-      document.getElementById('setCurrency').value = s.currency || 'BDT';
-      document.getElementById('setMaintenanceMode').checked = !!s.maintenanceMode;
-      CURRENT_CURRENCY = s.currency || 'BDT';
-    }
-  });
+/* =====================================================================================
+   NOTIFICATION MANAGEMENT
+===================================================================================== */
+function toggleNotifTargetUser(){
+  document.getElementById('notifUserPickWrap').classList.toggle('hidden', document.getElementById('notifTarget').value !== 'single');
+}
+async function addNotification(uid, message){
+  await db.collection('notifications').add({ uid, message, read:false, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+}
+async function addTransaction(uid, label, amount, type){
+  await db.collection('transactions').add({ uid, label, amount, type, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
 }
 
+async function sendNotification(){
+  const target = document.getElementById('notifTarget').value;
+  const message = document.getElementById('notifMessage').value.trim();
+  const scheduleVal = document.getElementById('notifSchedule').value;
+  if(!message){ showToast('Please write a message.','error'); return; }
+
+  let targetUid = 'all';
+  if(target === 'single'){
+    const email = document.getElementById('notifUserEmail').value.trim();
+    if(!email){ showToast('Enter the target user\'s email.','error'); return; }
+    const q = await db.collection('users').where('email','==',email).limit(1).get();
+    if(q.empty){ showToast('No user found with that email.','error'); return; }
+    targetUid = q.docs[0].id;
+  }
+
+  showLoading(true);
+  try{
+    if(scheduleVal){
+      // Scheduled — stored for a Cloud Function to dispatch at sendAt (see setup guide)
+      await db.collection('scheduledNotifications').add({
+        message, target: targetUid, status:'scheduled',
+        sendAt: firebase.firestore.Timestamp.fromDate(new Date(scheduleVal)),
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        createdBy: adminUser.email
+      });
+      showToast('Announcement scheduled.','success');
+    } else if(targetUid === 'all'){
+      const usersSnap = await db.collection('users').get();
+      const docs = usersSnap.docs;
+      // Firestore batches max out at 500 writes — chunk accordingly
+      for(let i=0; i<docs.length; i+=450){
+        const batch = db.batch();
+        docs.slice(i, i+450).forEach(u=>{
+          const ref = db.collection('notifications').doc();
+          batch.set(ref, { uid: u.id, message, read:false, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        });
+        await batch.commit();
+      }
+      await db.collection('scheduledNotifications').add({ message, target:'all', status:'sent', sendAt: firebase.firestore.FieldValue.serverTimestamp(), createdAt: firebase.firestore.FieldValue.serverTimestamp(), createdBy: adminUser.email });
+      showToast(`Notification sent to ${docs.length} users.`,'success');
+    } else {
+      await addNotification(targetUid, message);
+      await db.collection('scheduledNotifications').add({ message, target: targetUid, status:'sent', sendAt: firebase.firestore.FieldValue.serverTimestamp(), createdAt: firebase.firestore.FieldValue.serverTimestamp(), createdBy: adminUser.email });
+      showToast('Notification sent.','success');
+    }
+    document.getElementById('notifMessage').value = '';
+    document.getElementById('notifSchedule').value = '';
+  }catch(err){ showToast('Failed to send notification.','error'); }
+  showLoading(false);
+}
+
+function listenScheduledNotifications(){
+  const unsub = db.collection('scheduledNotifications').orderBy('createdAt','desc').limit(30).onSnapshot((snap)=>{
+    const body = document.getElementById('scheduledTableBody');
+    if(snap.empty){ body.innerHTML = '<tr><td colspan="4" class="empty-row">No announcements yet</td></tr>'; return; }
+    let html = '';
+    snap.forEach(doc=>{
+      const n = doc.data();
+      const targetLabel = n.target === 'all' ? 'All Users' : (allUsersCache[n.target]?.name || n.target.slice(0,10)+'...');
+      const sendTime = n.sendAt ? n.sendAt.toDate().toLocaleString() : '—';
+      html += `<tr><td>${escapeHtml(n.message)}</td><td>${escapeHtml(targetLabel)}</td><td>${sendTime}</td><td><span class="pill ${n.status==='sent'?'active':'pending'}">${n.status}</span></td></tr>`;
+    });
+    body.innerHTML = html;
+  });
+  unsubscribers.push(unsub);
+}
+
+/* =====================================================================================
+   GLOBAL SETTINGS
+===================================================================================== */
+function loadGlobalSettings(){
+  db.collection('settings').doc('global').get().then(doc=>{
+    const s = doc.exists ? doc.data() : {};
+    document.getElementById('setMinWithdraw').value = s.minWithdraw ?? 100;
+    document.getElementById('setDailyBonus').value = s.dailyBonusAmount ?? 1.00;
+    document.getElementById('setCurrency').value = s.currency || 'BDT';
+    document.getElementById('setMaintenanceMode').checked = !!s.maintenanceMode;
+  });
+}
 async function saveGlobalSettings(e){
   e.preventDefault();
-  await db.collection('settings').doc('global').set({
-    minWithdraw: parseFloat(document.getElementById('setMinWithdraw').value) || 100,
-    dailyBonusAmount: parseFloat(document.getElementById('setDailyBonus').value) || 1,
-    currency: document.getElementById('setCurrency').value,
-    maintenanceMode: document.getElementById('setMaintenanceMode').checked
-  }, { merge: true });
-  showToast('Settings saved.','success');
+  showLoading(true);
+  try{
+    const newCurrency = document.getElementById('setCurrency').value;
+    await db.collection('settings').doc('global').set({
+      minWithdraw: parseFloat(document.getElementById('setMinWithdraw').value),
+      dailyBonusAmount: parseFloat(document.getElementById('setDailyBonus').value),
+      currency: newCurrency,
+      maintenanceMode: document.getElementById('setMaintenanceMode').checked
+    }, { merge:true });
+    if(newCurrency !== CURRENT_CURRENCY){
+      CURRENT_CURRENCY = newCurrency;
+      // Every money figure already on screen was rendered with the old symbol — cleanest
+      // way to make them all correct immediately is to restart every listener.
+      detachAll();
+      initAllListeners();
+    }
+    showToast('Settings saved.','success');
+  }catch(err){ showToast('Failed to save settings.','error'); }
+  showLoading(false);
+  return false;
 }
 </script>
 </body>
