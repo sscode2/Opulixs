@@ -14,7 +14,7 @@
 :root{
   --bg:#0b0f1a; --card:#131a2b; --card2:#182140; --accent:#7c5cff; --accent2:#22d3a5;
   --text:#eef1f8; --muted:#8a93ac; --danger:#ff5b6b; --warn:#ffb84d; --ok:#22d3a5;
-  --radius:14px; --shadow:0 8px 24px rgba(0,0,0,.35); --sidebar-w:230px;
+  --radius:14px; --shadow:0 8px 24px rgba(0,0,0,.35); --sidebar-w:240px;
 }
 *{box-sizing:border-box; margin:0; padding:0;}
 html,body{height:100%;}
@@ -38,7 +38,7 @@ th{color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase
 .field input, .field select, .field textarea{width:100%; padding:11px; border-radius:10px; border:1px solid rgba(255,255,255,.08); background:var(--card2); color:var(--text); font-size:14px;}
 .field textarea{resize:vertical; min-height:70px;}
 .field input:focus, .field select:focus, .field textarea:focus{outline:2px solid var(--accent);}
-.btn{padding:11px 16px; border-radius:10px; border:none; font-weight:700; font-size:13px; background:var(--accent); color:#fff;}
+.btn{padding:11px 16px; border-radius:10px; border:none; font-weight:700; font-size:13px; background:var(--accent); color:#fff; display:inline-flex; align-items:center; justify-content:center; gap:6px;}
 .btn.block{width:100%; margin-top:14px;}
 .btn.secondary{background:var(--card2); color:var(--text);}
 .btn.danger{background:var(--danger); color:#fff;}
@@ -52,7 +52,7 @@ th{color:var(--muted); font-weight:600; font-size:11px; text-transform:uppercase
 .sidebar{width:var(--sidebar-w); flex-shrink:0; background:var(--card); border-right:1px solid rgba(255,255,255,.06); padding:20px 14px; position:fixed; top:0; bottom:0; left:0; overflow-y:auto; transition:transform .25s; z-index:80;}
 .sidebar-logo{font-size:20px; font-weight:900; padding:0 8px 20px; letter-spacing:.5px;}
 .sidebar-logo span{color:var(--accent);}
-.side-link{display:flex; align-items:center; gap:10px; padding:11px 10px; border-radius:10px; color:var(--muted); font-size:13px; font-weight:600; margin-bottom:4px;}
+.side-link{display:flex; align-items:center; gap:10px; padding:11px 10px; border-radius:10px; color:var(--muted); font-size:13px; font-weight:600; margin-bottom:4px; width:100%; background:none; border:none; text-align:left;}
 .side-link .ic{font-size:16px; width:20px; text-align:center;}
 .side-link.active{background:var(--accent); color:#fff;}
 .side-link:hover:not(.active){background:var(--card2); color:var(--text);}
@@ -119,6 +119,35 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
 @keyframes spin{to{transform:rotate(360deg);}}
 .empty-row{color:var(--muted); padding:14px 0; font-size:13px; text-align:center;}
 
+/* ---------- Screenshot Preview Widget ---------- */
+.preview-screen-box{
+  max-width:390px; margin:16px auto 0; background:#0b0f1a; border-radius:22px; padding:14px;
+  box-shadow:0 12px 36px rgba(0,0,0,.6); border:1px solid rgba(255,255,255,.08);
+}
+.preview-video-container{
+  position:relative; width:100%; padding-top:56.25%; border-radius:14px; overflow:hidden;
+  background:#000; margin-bottom:10px;
+}
+.preview-video-container iframe{
+  position:absolute; top:0; left:0; width:100%; height:100%; border:0;
+}
+.preview-action-btn{
+  background:linear-gradient(90deg, #00c853, #00b0ff);
+  padding:12px 14px; border-radius:14px; display:flex; align-items:center; justify-content:space-between;
+  color:#fff; text-decoration:none; box-shadow:0 6px 18px rgba(0,200,83,.25);
+}
+.preview-action-left{display:flex; align-items:center; gap:12px;}
+.preview-action-circle{
+  width:38px; height:38px; border-radius:50%; background:#fff; display:flex; align-items:center;
+  justify-content:center; color:#00c853; font-size:16px; flex-shrink:0;
+}
+.preview-action-title{font-size:14px; font-weight:800; line-height:1.2;}
+.preview-action-sub{font-size:11px; opacity:.9; margin-top:2px;}
+.preview-action-arrow{
+  width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,.2);
+  display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800;
+}
+
 @media (max-width: 860px){
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
@@ -152,6 +181,7 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
   <div class="sidebar" id="sidebar">
     <div class="sidebar-logo">OPUL<span>IX</span> Admin</div>
     <button class="side-link active" data-page="dashboard" onclick="goAdminPage('dashboard')"><span class="ic">📊</span>Dashboard</button>
+    <button class="side-link" data-page="home-video" onclick="goAdminPage('home-video')"><span class="ic">🎬</span>Featured Video & Action</button>
     <button class="side-link" data-page="users" onclick="goAdminPage('users')"><span class="ic">👥</span>User Management</button>
     <button class="side-link" data-page="tasks" onclick="goAdminPage('tasks')"><span class="ic">✅</span>Task Management</button>
     <button class="side-link" data-page="withdraw" onclick="goAdminPage('withdraw')"><span class="ic">💸</span>Withdrawals</button>
@@ -194,6 +224,73 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
         <div class="card table-wrap">
           <table><thead><tr><th>User</th><th>Method</th><th>Amount</th><th>Status</th></tr></thead>
           <tbody id="dashRecentWithdrawals"><tr><td colspan="4" class="empty-row">Loading...</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- ================= FEATURED VIDEO & ACTION BANNER (DEDICATED CATEGORY) ================= -->
+      <div id="admin-page-home-video" class="admin-page hidden">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:20px;">
+          
+          <!-- Edit Form -->
+          <form class="card" onsubmit="return saveFeaturedVideoSettings(event)">
+            <div class="section-title" style="margin-top:0;">Featured Video & Action Configuration</div>
+            <div style="font-size:12px; color:var(--muted); margin-bottom:14px;">
+              This video player appears right between the <b>Claim Daily Bonus</b> and <b>Recent Activity</b> sections on the user app homepage (matching your screenshot).
+            </div>
+
+            <div class="toggle-row">
+              <span>Show Featured Video & Action on Homepage</span>
+              <label class="switch"><input type="checkbox" id="fvEnabled" checked /><span class="slider-tog"></span></label>
+            </div>
+
+            <div class="field">
+              <label>YouTube Video URL or Video ID</label>
+              <input type="text" id="fvYoutubeUrl" required placeholder="https://www.youtube.com/watch?v=..." oninput="updateFeaturedVideoPreview()" />
+              <div style="font-size:11px; color:var(--muted); margin-top:4px;">Supports standard watch URLs, shortened (youtu.be), or direct 11-character video IDs.</div>
+            </div>
+
+            <div class="field">
+              <label>Action Banner Title</label>
+              <input type="text" id="fvActionTitle" required placeholder="e.g. Start Earning Now" oninput="updateFeaturedVideoPreview()" />
+            </div>
+
+            <div class="field">
+              <label>Action Banner Subtitle</label>
+              <input type="text" id="fvActionSubtitle" placeholder="e.g. Watch video & complete tasks" oninput="updateFeaturedVideoPreview()" />
+            </div>
+
+            <div class="field">
+              <label>Direct Action Target URL / Link</label>
+              <input type="text" id="fvActionUrl" required placeholder="e.g. tasks or https://t.me/yourchannel" />
+              <div style="font-size:11px; color:var(--muted); margin-top:4px;">Type <code>tasks</code> to open the internal tasks tab, or enter any external <code>https://...</code> link.</div>
+            </div>
+
+            <button class="btn block" type="submit">💾 Save Homepage Video & Action</button>
+          </form>
+
+          <!-- Live Visual Preview -->
+          <div class="card">
+            <div class="section-title" style="margin-top:0;">Homepage Live Preview</div>
+            <div style="font-size:12px; color:var(--muted); margin-bottom:12px;">This is how users see it on their mobile dashboard:</div>
+
+            <div class="preview-screen-box">
+              <div class="preview-video-container" id="previewIframeContainer">
+                <div style="color:var(--muted); display:flex; align-items:center; justify-content:center; height:100%; font-size:13px;">Enter a YouTube URL to preview</div>
+              </div>
+
+              <div class="preview-action-btn" id="previewActionBtn">
+                <div class="preview-action-left">
+                  <div class="preview-action-circle">▶</div>
+                  <div>
+                    <div class="preview-action-title" id="prevTitle">Start Earning Now</div>
+                    <div class="preview-action-sub" id="prevSubtitle">Watch video & complete tasks</div>
+                  </div>
+                </div>
+                <div class="preview-action-arrow">›</div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -284,7 +381,7 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
           <div class="field"><label>Message</label><textarea id="notifMessage" placeholder="Write your announcement..."></textarea></div>
           <div class="field"><label>Schedule (optional — leave blank to send now)</label><input type="datetime-local" id="notifSchedule" /></div>
           <button class="btn block" onclick="sendNotification()">Send / Schedule</button>
-          <div style="font-size:11px; color:var(--muted); margin-top:8px;">Scheduled announcements require the Cloud Function described in the setup guide to actually dispatch at the chosen time — without it they'll stay queued.</div>
+          <div style="font-size:11px; color:var(--muted); margin-top:8px;">Scheduled announcements require a background Cloud Function to dispatch at the chosen time.</div>
         </div>
         <div class="section-title">Scheduled / Sent Announcements</div>
         <div class="card table-wrap">
@@ -325,24 +422,23 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
           <option value="youtube">YouTube Watch</option>
           <option value="facebook">Facebook Follow</option>
           <option value="telegram">Telegram Join</option>
+          <option value="website">Website Visit</option>
           <option value="app-install">App Install</option>
           <option value="daily-bonus">Daily Bonus</option>
         </select>
       </div>
       <div class="field"><label id="taskRewardLabel">Reward Amount (৳)</label><input type="number" id="taskReward" min="0" step="0.01" required /></div>
 
-      <!-- Standard fields — used by every task type EXCEPT App Install -->
       <div id="standardTaskFields">
         <div class="field"><label>Cooldown (minutes, 0 = one-time / no cooldown)</label><input type="number" id="taskCooldown" min="0" step="1" value="0" /></div>
         <div class="field"><label>Target Link (optional)</label><input type="text" id="taskLink" placeholder="https://..." /></div>
       </div>
 
-      <!-- App Install–only fields -->
       <div id="appInstallTaskFields" class="hidden">
         <div class="field"><label>Package Name / Deep Link</label><input type="text" id="taskAppDeepLink" placeholder="e.g. com.example.app or myapp://open" /></div>
         <div class="field"><label>Play Store Link</label><input type="text" id="taskPlayStoreLink" placeholder="https://play.google.com/store/apps/details?id=..." /></div>
         <div class="field"><label>Check-in Duration (days, 1–30)</label><input type="number" id="taskCheckinDays" min="1" max="30" step="1" value="7" /></div>
-        <div class="field"><label>Daily Reward (optional — paid each day checked in, on top of the Reward Amount above which pays out on the final day)</label><input type="number" id="taskDailyReward" min="0" step="0.01" placeholder="0" /></div>
+        <div class="field"><label>Daily Reward (optional — paid each day checked in)</label><input type="number" id="taskDailyReward" min="0" step="0.01" placeholder="0" /></div>
       </div>
 
       <div class="field"><label>Description</label><textarea id="taskDescription"></textarea></div>
@@ -397,9 +493,8 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
 
 <script>
 /* =====================================================================================
-   FIREBASE CONFIG — use the SAME project/config as the OPULIX user app (index.html)
+   FIREBASE CONFIG
 ===================================================================================== */
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyAyZk5v3jpJ4e7ltx0CdIKaZsPy2p0QXUQ",
   authDomain: "opulix-app.firebaseapp.com",
@@ -432,8 +527,16 @@ const CURRENCY_SYMBOLS = { BDT:'৳', USD:'$', INR:'₹' };
 let CURRENT_CURRENCY = 'BDT';
 function fmtMoney(n){ return (CURRENCY_SYMBOLS[CURRENT_CURRENCY] || '৳') + (n||0).toFixed(2); }
 
+function parseYoutubeId(url){
+  if(!url) return '';
+  const clean = url.trim();
+  if(/^[a-zA-Z0-9_-]{11}$/.test(clean)) return clean;
+  const match = clean.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/|watch\?.+&v=))([\w-]{11})/);
+  return match ? match[1] : '';
+}
+
 /* =====================================================================================
-   ADMIN AUTH — only uids present in admins/{uid} may enter
+   ADMIN AUTH
 ===================================================================================== */
 async function handleAdminLogin(e){
   e.preventDefault();
@@ -492,7 +595,7 @@ auth.onAuthStateChanged(async (user)=>{
     try{
       const settingsDoc = await db.collection('settings').doc('global').get();
       if(settingsDoc.exists && settingsDoc.data().currency) CURRENT_CURRENCY = settingsDoc.data().currency;
-    }catch(err){ /* fall back to BDT default */ }
+    }catch(err){}
     initAllListeners();
   }catch(err){
     showToast('Failed to verify admin access.','error');
@@ -506,12 +609,23 @@ function detachAll(){ unsubscribers.forEach(u=>u()); unsubscribers = []; }
 /* =====================================================================================
    NAVIGATION
 ===================================================================================== */
-const PAGE_TITLES = { dashboard:'Dashboard', users:'User Management', tasks:'Task Management', withdraw:'Withdrawal Management', referral:'Referral Management', notifications:'Notification Management', settings:'Settings' };
+const PAGE_TITLES = { 
+  dashboard:'Dashboard', 
+  'home-video':'Featured Video & Action Banner',
+  users:'User Management', 
+  tasks:'Task Management', 
+  withdraw:'Withdrawal Management', 
+  referral:'Referral Management', 
+  notifications:'Notification Management', 
+  settings:'Settings' 
+};
+
 function goAdminPage(page){
   document.querySelectorAll('.admin-page').forEach(p=>p.classList.add('hidden'));
-  document.getElementById('admin-page-'+page).classList.remove('hidden');
+  const target = document.getElementById('admin-page-'+page);
+  if(target) target.classList.remove('hidden');
   document.querySelectorAll('.side-link').forEach(l=>l.classList.toggle('active', l.dataset.page===page));
-  document.getElementById('pageTitle').textContent = PAGE_TITLES[page];
+  document.getElementById('pageTitle').textContent = PAGE_TITLES[page] || 'Dashboard';
   document.getElementById('sidebar').classList.remove('open');
 }
 
@@ -521,6 +635,7 @@ function goAdminPage(page){
 let allUsersCache = {};
 function initAllListeners(){
   listenDashboardStats();
+  listenFeaturedVideoSettings();
   listenUsersPage();
   listenTasksPage();
   listenTutorialsPage();
@@ -528,6 +643,77 @@ function initAllListeners(){
   listenReferralPage();
   loadGlobalSettings();
   listenScheduledNotifications();
+}
+
+/* =====================================================================================
+   FEATURED VIDEO & DIRECT ACTION MANAGEMENT (NEW DEDICATED CATEGORY)
+===================================================================================== */
+function listenFeaturedVideoSettings(){
+  const unsub = db.collection('settings').doc('featuredVideo').onSnapshot((doc)=>{
+    if(doc.exists){
+      const data = doc.data();
+      document.getElementById('fvEnabled').checked = data.enabled !== false;
+      document.getElementById('fvYoutubeUrl').value = data.youtubeUrl || '';
+      document.getElementById('fvActionTitle').value = data.actionTitle || 'Start Earning Now';
+      document.getElementById('fvActionSubtitle').value = data.actionSubtitle || 'Watch video & complete tasks';
+      document.getElementById('fvActionUrl').value = data.actionUrl || 'tasks';
+    } else {
+      document.getElementById('fvEnabled').checked = true;
+      document.getElementById('fvYoutubeUrl').value = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+      document.getElementById('fvActionTitle').value = 'Start Earning Now';
+      document.getElementById('fvActionSubtitle').value = 'Watch video & complete tasks';
+      document.getElementById('fvActionUrl').value = 'tasks';
+    }
+    updateFeaturedVideoPreview();
+  });
+  unsubscribers.push(unsub);
+}
+
+function updateFeaturedVideoPreview(){
+  const url = document.getElementById('fvYoutubeUrl').value;
+  const title = document.getElementById('fvActionTitle').value || 'Start Earning Now';
+  const subtitle = document.getElementById('fvActionSubtitle').value || 'Watch video & complete tasks';
+  const videoId = parseYoutubeId(url);
+
+  document.getElementById('prevTitle').textContent = title;
+  document.getElementById('prevSubtitle').textContent = subtitle;
+
+  const container = document.getElementById('previewIframeContainer');
+  if(videoId){
+    container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&modestbranding=1&rel=0&playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+  } else {
+    container.innerHTML = `<div style="color:var(--muted); display:flex; align-items:center; justify-content:center; height:100%; font-size:13px;">Enter a valid YouTube URL</div>`;
+  }
+}
+
+async function saveFeaturedVideoSettings(e){
+  e.preventDefault();
+  const url = document.getElementById('fvYoutubeUrl').value.trim();
+  const videoId = parseYoutubeId(url);
+  if(!videoId){
+    showToast('Please enter a valid YouTube Video URL.','error');
+    return false;
+  }
+
+  showLoading(true);
+  try{
+    await db.collection('settings').doc('featuredVideo').set({
+      enabled: document.getElementById('fvEnabled').checked,
+      youtubeUrl: url,
+      videoId: videoId,
+      actionTitle: document.getElementById('fvActionTitle').value.trim(),
+      actionSubtitle: document.getElementById('fvActionSubtitle').value.trim(),
+      actionUrl: document.getElementById('fvActionUrl').value.trim(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedBy: adminUser.email
+    }, { merge: true });
+    showToast('Featured Video & Action saved successfully!','success');
+  }catch(err){
+    console.error(err);
+    showToast('Failed to save featured video settings.','error');
+  }
+  showLoading(false);
+  return false;
 }
 
 /* =====================================================================================
@@ -777,7 +963,7 @@ async function viewUserDetail(uid){
         <div class="stat-box"><div class="stat-label">Completed Tasks</div><div class="stat-value">${completedCount}</div></div>
         <div class="stat-box"><div class="stat-label">Total Earnings</div><div class="stat-value">${fmtMoney(d.totalEarnings)}</div></div>
       </div>
-      <div class="section-title" style="margin-top:0;">Recent Transactions (Activity History)</div>
+      <div class="section-title" style="margin-top:0;">Recent Transactions</div>
       ${txHtml}
     `;
     openModal('userDetailModal');
@@ -789,7 +975,7 @@ async function viewUserDetail(uid){
 }
 
 /* =====================================================================================
-   TASK MANAGEMENT & HOW TO WORK TUTORIAL VIDEOS
+   TASK MANAGEMENT & TUTORIALS
 ===================================================================================== */
 function listenTasksPage(){
   const unsub = db.collection('tasks').orderBy('createdAt','desc').onSnapshot((snap)=>{
@@ -913,7 +1099,7 @@ async function deleteTask(id){
   showLoading(false);
 }
 
-/* Tutorial Videos Functions */
+/* Tutorial Videos */
 function listenTutorialsPage(){
   const unsub = db.collection('tutorials').orderBy('createdAt','desc').onSnapshot((snap)=>{
     const body = document.getElementById('tutorialsTableBody');
