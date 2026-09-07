@@ -120,35 +120,6 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
 @keyframes spin{to{transform:rotate(360deg);}}
 .empty-row{color:var(--muted); padding:14px 0; font-size:13px; text-align:center;}
 
-/* ---------- Screenshot Preview Widget ---------- */
-.preview-screen-box{
-  max-width:390px; margin:16px auto 0; background:#0b0f1a; border-radius:22px; padding:14px;
-  box-shadow:0 12px 36px rgba(0,0,0,.6); border:1px solid rgba(255,255,255,.08);
-}
-.preview-video-container{
-  position:relative; width:100%; padding-top:56.25%; border-radius:14px; overflow:hidden;
-  background:#000; margin-bottom:10px;
-}
-.preview-video-container iframe{
-  position:absolute; top:0; left:0; width:100%; height:100%; border:0;
-}
-.preview-action-btn{
-  background:linear-gradient(90deg, #00c853, #00b0ff);
-  padding:12px 14px; border-radius:14px; display:flex; align-items:center; justify-content:space-between;
-  color:#fff; text-decoration:none; box-shadow:0 6px 18px rgba(0,200,83,.25);
-}
-.preview-action-left{display:flex; align-items:center; gap:12px;}
-.preview-action-circle{
-  width:38px; height:38px; border-radius:50%; background:#fff; display:flex; align-items:center;
-  justify-content:center; color:#00c853; font-size:16px; flex-shrink:0;
-}
-.preview-action-title{font-size:14px; font-weight:800; line-height:1.2;}
-.preview-action-sub{font-size:11px; opacity:.9; margin-top:2px;}
-.preview-action-arrow{
-  width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,.2);
-  display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800;
-}
-
 @media (max-width: 860px){
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
@@ -187,6 +158,7 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
     <button class="side-link" data-page="tasks" onclick="goAdminPage('tasks')"><span class="ic">✅</span>Task Management</button>
     <button class="side-link" data-page="withdraw" onclick="goAdminPage('withdraw')"><span class="ic">💸</span>Withdrawals</button>
     <button class="side-link" data-page="referral" onclick="goAdminPage('referral')"><span class="ic">🔗</span>Referrals</button>
+    <button class="side-link" data-page="affiliate" onclick="goAdminPage('affiliate')"><span class="ic">🛍️</span>Affiliate Program</button>
     <button class="side-link" data-page="notifications" onclick="goAdminPage('notifications')"><span class="ic">🔔</span>Notifications</button>
     <button class="side-link" data-page="settings" onclick="goAdminPage('settings')"><span class="ic">⚙️</span>Settings</button>
     <div class="sidebar-foot">
@@ -246,18 +218,18 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
 
             <div class="field">
               <label>YouTube Video URL or Video ID</label>
-              <input type="text" id="fvYoutubeUrl" required placeholder="https://www.youtube.com/watch?v=..." oninput="updateFeaturedVideoPreview()" />
+              <input type="text" id="fvYoutubeUrl" required placeholder="https://www.youtube.com/watch?v=..." />
               <div style="font-size:11px; color:var(--muted); margin-top:4px;">Supports standard watch URLs, shortened (youtu.be), or direct 11-character video IDs.</div>
             </div>
 
             <div class="field">
               <label>Action Banner Title</label>
-              <input type="text" id="fvActionTitle" required placeholder="e.g. Start Earning Now" oninput="updateFeaturedVideoPreview()" />
+              <input type="text" id="fvActionTitle" required placeholder="e.g. Start Earning Now" />
             </div>
 
             <div class="field">
               <label>Action Banner Subtitle</label>
-              <input type="text" id="fvActionSubtitle" placeholder="e.g. Watch video & complete tasks" oninput="updateFeaturedVideoPreview()" />
+              <input type="text" id="fvActionSubtitle" placeholder="e.g. Watch video & complete tasks" />
             </div>
 
             <div class="field">
@@ -268,29 +240,6 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
 
             <button class="btn block" type="submit">💾 Save Homepage Video & Action</button>
           </form>
-
-          <!-- Live Visual Preview -->
-          <div class="card">
-            <div class="section-title" style="margin-top:0;">Homepage Live Preview</div>
-            <div style="font-size:12px; color:var(--muted); margin-bottom:12px;">This is how users see it on their mobile dashboard:</div>
-
-            <div class="preview-screen-box">
-              <div class="preview-video-container" id="previewIframeContainer">
-                <div style="color:var(--muted); display:flex; align-items:center; justify-content:center; height:100%; font-size:13px;">Enter a YouTube URL to preview</div>
-              </div>
-
-              <div class="preview-action-btn" id="previewActionBtn">
-                <div class="preview-action-left">
-                  <div class="preview-action-circle">▶</div>
-                  <div>
-                    <div class="preview-action-title" id="prevTitle">Start Earning Now</div>
-                    <div class="preview-action-sub" id="prevSubtitle">Watch video & complete tasks</div>
-                  </div>
-                </div>
-                <div class="preview-action-arrow">›</div>
-              </div>
-            </div>
-          </div>
 
         </div>
       </div>
@@ -361,6 +310,32 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
         <div class="card table-wrap">
           <table><thead><tr><th>Referrer</th><th>Referred User</th><th>Referrer Bonus</th><th>Date</th></tr></thead>
           <tbody id="referralsTableBody"><tr><td colspan="4" class="empty-row">Loading...</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- ================= AFFILIATE PROGRAM ================= -->
+      <div id="admin-page-affiliate" class="admin-page hidden">
+        <div class="section-title" style="margin-top:0;">Affiliate Products</div>
+        <div class="toolbar"><button class="btn" onclick="openAffiliateProductModal()">+ Add Product</button></div>
+        <div class="card table-wrap">
+          <table>
+            <thead><tr><th>Product</th><th>Price</th><th>Commission</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="affiliateProductsTableBody"><tr><td colspan="5" class="empty-row">Loading...</td></tr></tbody>
+          </table>
+        </div>
+
+        <div class="section-title">Affiliate Sales</div>
+        <div class="toolbar"><button class="btn" onclick="openAffiliateSaleModal()">+ Log New Sale</button></div>
+        <div class="tabs">
+          <button class="tab-btn active" data-status="pending" onclick="filterAffiliateSales('pending')">Pending</button>
+          <button class="tab-btn" data-status="approved" onclick="filterAffiliateSales('approved')">Approved</button>
+          <button class="tab-btn" data-status="rejected" onclick="filterAffiliateSales('rejected')">Rejected</button>
+        </div>
+        <div class="card table-wrap">
+          <table>
+            <thead><tr><th>Affiliate</th><th>Product</th><th>Sale Amount</th><th>Commission</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody id="affiliateSalesTableBody"><tr><td colspan="6" class="empty-row">Loading...</td></tr></tbody>
+          </table>
         </div>
       </div>
 
@@ -494,6 +469,47 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
       </div>
       <div class="toggle-row"><span>Enabled</span><label class="switch"><input type="checkbox" id="tutorialEnabled" checked /><span class="slider-tog"></span></label></div>
       <button class="btn block" type="submit">Save Tutorial</button>
+    </form>
+  </div>
+</div>
+
+<div id="affiliateProductModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-title"><span id="affProductModalTitle">Add Product</span><button class="modal-close" onclick="closeModal('affiliateProductModal')">✕</button></div>
+    <form onsubmit="return saveAffiliateProduct(event)">
+      <input type="hidden" id="affProductEditId" />
+      <div class="field"><label>Product Name</label><input type="text" id="affProductName" required /></div>
+      <div class="field"><label>Price (৳)</label><input type="number" id="affProductPrice" min="0" step="0.01" required /></div>
+      <div class="field"><label>Commission Type</label>
+        <select id="affProductCommissionType" onchange="onAffCommissionTypeChange()">
+          <option value="percent">Percentage (%)</option>
+          <option value="flat">Flat Amount (৳)</option>
+        </select>
+      </div>
+      <div class="field"><label id="affProductCommissionLabel">Commission (%)</label><input type="number" id="affProductCommissionValue" min="0" step="0.01" required /></div>
+      <div class="field"><label>Product / Buy Link (optional)</label><input type="text" id="affProductLink" placeholder="https://..." /></div>
+      <div class="field"><label>Titles (one per line — rotated across affiliates)</label><textarea id="affProductTitles" rows="3" placeholder="Catchy title #1&#10;Catchy title #2"></textarea></div>
+      <div class="field"><label>Descriptions (one per line — rotated across affiliates)</label><textarea id="affProductDescriptions" rows="4" placeholder="Description variant #1&#10;Description variant #2"></textarea></div>
+      <div class="field"><label>Video Download Links (one per line — rotated across affiliates)</label><textarea id="affProductVideos" rows="3" placeholder="https://.../video1.mp4&#10;https://.../video2.mp4"></textarea></div>
+      <div class="toggle-row"><span>Enabled</span><label class="switch"><input type="checkbox" id="affProductEnabled" checked /><span class="slider-tog"></span></label></div>
+      <button class="btn block" type="submit">Save Product</button>
+    </form>
+  </div>
+</div>
+
+<div id="affiliateSaleModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-title"><span>Log Affiliate Sale</span><button class="modal-close" onclick="closeModal('affiliateSaleModal')">✕</button></div>
+    <form onsubmit="return saveAffiliateSale(event)">
+      <div class="field"><label>Affiliate User Email</label><input type="text" id="affSaleUserEmail" required placeholder="user@example.com" /></div>
+      <div class="field"><label>Product</label>
+        <select id="affSaleProduct" required onchange="onAffSaleProductChange()"></select>
+      </div>
+      <div class="field"><label>Sale Amount (৳)</label><input type="number" id="affSaleAmount" min="0" step="0.01" required oninput="recalcAffSaleCommission()" /></div>
+      <div class="field"><label>Commission to Credit (৳)</label><input type="number" id="affSaleCommission" min="0" step="0.01" required /></div>
+      <div class="field"><label>Note (optional)</label><input type="text" id="affSaleNote" placeholder="Order ref, customer name, etc." /></div>
+      <div class="error-text" id="affSaleError"></div>
+      <button class="btn block" type="submit">Log Sale (Pending)</button>
     </form>
   </div>
 </div>
@@ -647,6 +663,7 @@ const PAGE_TITLES = {
   tasks:'Task Management', 
   withdraw:'Withdrawal Management', 
   referral:'Referral Management', 
+  affiliate:'Affiliate Program', 
   notifications:'Notification Management', 
   settings:'Settings' 
 };
@@ -672,6 +689,8 @@ function initAllListeners(){
   listenTutorialsPage();
   listenWithdrawPage();
   listenReferralPage();
+  listenAffiliateProductsPage();
+  listenAffiliateSalesPage();
   loadGlobalSettings();
   listenScheduledNotifications();
 }
@@ -695,26 +714,8 @@ function listenFeaturedVideoSettings(){
       document.getElementById('fvActionSubtitle').value = 'Watch video & complete tasks';
       document.getElementById('fvActionUrl').value = 'tasks';
     }
-    updateFeaturedVideoPreview();
   });
   unsubscribers.push(unsub);
-}
-
-function updateFeaturedVideoPreview(){
-  const url = document.getElementById('fvYoutubeUrl').value;
-  const title = document.getElementById('fvActionTitle').value || 'Start Earning Now';
-  const subtitle = document.getElementById('fvActionSubtitle').value || 'Watch video & complete tasks';
-  const videoId = parseYoutubeId(url);
-
-  document.getElementById('prevTitle').textContent = title;
-  document.getElementById('prevSubtitle').textContent = subtitle;
-
-  const container = document.getElementById('previewIframeContainer');
-  if(videoId){
-    container.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&controls=0&modestbranding=1&rel=0&playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-  } else {
-    container.innerHTML = `<div style="color:var(--muted); display:flex; align-items:center; justify-content:center; height:100%; font-size:13px;">Enter a valid YouTube URL</div>`;
-  }
 }
 
 async function saveFeaturedVideoSettings(e){
@@ -1400,6 +1401,257 @@ async function saveReferralSettings(){
     }, { merge:true });
     showToast('Referral settings saved.','success');
   }catch(err){ showToast('Failed to save referral settings.','error'); }
+  showLoading(false);
+}
+
+/* =====================================================================================
+   AFFILIATE PROGRAM MANAGEMENT
+===================================================================================== */
+let affiliateProductsAdminCache = {};
+
+function listenAffiliateProductsPage(){
+  const unsub = db.collection('affiliateProducts').orderBy('createdAt','desc').onSnapshot((snap)=>{
+    affiliateProductsAdminCache = {};
+    const body = document.getElementById('affiliateProductsTableBody');
+    if(snap.empty){
+      body.innerHTML = '<tr><td colspan="5" class="empty-row">No products yet</td></tr>';
+      populateAffSaleProductOptions();
+      return;
+    }
+    let html = '';
+    snap.forEach(doc=>{
+      const p = doc.data();
+      affiliateProductsAdminCache[doc.id] = p;
+      const commissionLabel = p.commissionType === 'flat' ? fmtMoney(p.commissionValue||0) : `${p.commissionValue||0}%`;
+      html += `<tr>
+        <td>${escapeHtml(p.name)}</td>
+        <td>${fmtMoney(p.price||0)}</td>
+        <td>${commissionLabel}</td>
+        <td><span class="pill ${p.enabled?'active':'banned'}">${p.enabled?'Enabled':'Disabled'}</span></td>
+        <td style="white-space:nowrap;">
+          <button class="btn sm secondary" onclick='editAffiliateProduct("${doc.id}")'>Edit</button>
+          <button class="btn sm danger" onclick="deleteAffiliateProduct('${doc.id}')">Delete</button>
+        </td>
+      </tr>`;
+    });
+    body.innerHTML = html;
+    populateAffSaleProductOptions();
+  }, err=>console.error('affiliate products listener error:', err));
+  unsubscribers.push(unsub);
+}
+
+function populateAffSaleProductOptions(){
+  const sel = document.getElementById('affSaleProduct');
+  if(!sel) return;
+  const current = sel.value;
+  const entries = Object.entries(affiliateProductsAdminCache);
+  sel.innerHTML = entries.length
+    ? entries.map(([id,p])=>`<option value="${id}">${escapeHtml(p.name)}</option>`).join('')
+    : '<option value="">No products available</option>';
+  if(current && affiliateProductsAdminCache[current]) sel.value = current;
+}
+
+function onAffCommissionTypeChange(){
+  const isFlat = document.getElementById('affProductCommissionType').value === 'flat';
+  document.getElementById('affProductCommissionLabel').textContent = isFlat ? 'Commission (৳)' : 'Commission (%)';
+}
+
+function openAffiliateProductModal(){
+  document.getElementById('affProductModalTitle').textContent = 'Add Product';
+  document.getElementById('affProductEditId').value = '';
+  document.getElementById('affProductName').value = '';
+  document.getElementById('affProductPrice').value = '';
+  document.getElementById('affProductCommissionType').value = 'percent';
+  document.getElementById('affProductCommissionValue').value = '';
+  document.getElementById('affProductLink').value = '';
+  document.getElementById('affProductTitles').value = '';
+  document.getElementById('affProductDescriptions').value = '';
+  document.getElementById('affProductVideos').value = '';
+  document.getElementById('affProductEnabled').checked = true;
+  onAffCommissionTypeChange();
+  openModal('affiliateProductModal');
+}
+async function editAffiliateProduct(id){
+  showLoading(true);
+  try{
+    const doc = await db.collection('affiliateProducts').doc(id).get();
+    const p = doc.data();
+    document.getElementById('affProductModalTitle').textContent = 'Edit Product';
+    document.getElementById('affProductEditId').value = id;
+    document.getElementById('affProductName').value = p.name;
+    document.getElementById('affProductPrice').value = p.price;
+    document.getElementById('affProductCommissionType').value = p.commissionType || 'percent';
+    document.getElementById('affProductCommissionValue').value = p.commissionValue;
+    document.getElementById('affProductLink').value = p.link || '';
+    document.getElementById('affProductTitles').value = (Array.isArray(p.titles) ? p.titles : []).join('\n');
+    document.getElementById('affProductDescriptions').value = (Array.isArray(p.descriptions) ? p.descriptions : (p.description ? [p.description] : [])).join('\n');
+    document.getElementById('affProductVideos').value = (Array.isArray(p.videoUrls) ? p.videoUrls : []).join('\n');
+    document.getElementById('affProductEnabled').checked = !!p.enabled;
+    onAffCommissionTypeChange();
+    openModal('affiliateProductModal');
+  }catch(err){ showToast('Failed to load product.','error'); }
+  showLoading(false);
+}
+function parseAffLines(elId){
+  return document.getElementById(elId).value.split('\n').map(s=>s.trim()).filter(Boolean);
+}
+async function saveAffiliateProduct(e){
+  e.preventDefault();
+  const id = document.getElementById('affProductEditId').value;
+  const titles = parseAffLines('affProductTitles');
+  const descriptions = parseAffLines('affProductDescriptions');
+  const videoUrls = parseAffLines('affProductVideos');
+  const data = {
+    name: document.getElementById('affProductName').value.trim(),
+    price: parseFloat(document.getElementById('affProductPrice').value) || 0,
+    commissionType: document.getElementById('affProductCommissionType').value,
+    commissionValue: parseFloat(document.getElementById('affProductCommissionValue').value) || 0,
+    link: document.getElementById('affProductLink').value.trim(),
+    titles: titles,
+    descriptions: descriptions,
+    videoUrls: videoUrls,
+    description: descriptions[0] || '',
+    enabled: document.getElementById('affProductEnabled').checked
+  };
+  showLoading(true);
+  try{
+    if(id){
+      await db.collection('affiliateProducts').doc(id).update(data);
+      showToast('Product updated.','success');
+    }else{
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection('affiliateProducts').add(data);
+      showToast('Product created.','success');
+    }
+    closeModal('affiliateProductModal');
+  }catch(err){ showToast('Failed to save product.','error'); }
+  showLoading(false);
+  return false;
+}
+async function deleteAffiliateProduct(id){
+  if(!confirm('Delete this product? This cannot be undone.')) return;
+  showLoading(true);
+  try{ await db.collection('affiliateProducts').doc(id).delete(); showToast('Product deleted.','success'); }
+  catch(err){ showToast('Failed to delete product.','error'); }
+  showLoading(false);
+}
+
+/* Affiliate Sales */
+let currentAffSaleFilter = 'pending';
+let allAffiliateSalesCache = [];
+function listenAffiliateSalesPage(){
+  const unsub = db.collection('affiliateSales').orderBy('createdAt','desc').onSnapshot((snap)=>{
+    allAffiliateSalesCache = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    renderAffiliateSalesTable();
+  }, err=>console.error('affiliate sales listener error:', err));
+  unsubscribers.push(unsub);
+}
+function filterAffiliateSales(status){
+  currentAffSaleFilter = status;
+  document.querySelectorAll('#admin-page-affiliate .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.status===status));
+  renderAffiliateSalesTable();
+}
+function renderAffiliateSalesTable(){
+  const body = document.getElementById('affiliateSalesTableBody');
+  const filtered = allAffiliateSalesCache.filter(s=>s.status===currentAffSaleFilter);
+  if(filtered.length === 0){ body.innerHTML = `<tr><td colspan="6" class="empty-row">No ${currentAffSaleFilter} sales</td></tr>`; return; }
+  let html = '';
+  filtered.forEach(s=>{
+    const uinfo = allUsersCache[s.uid];
+    const uname = uinfo ? uinfo.name : (s.uid||'').slice(0,10)+'...';
+    const date = s.createdAt ? s.createdAt.toDate().toLocaleString() : '—';
+    let actions = '';
+    if(s.status === 'pending'){
+      actions = `<button class="btn sm ok" onclick="approveAffiliateSale('${s.id}')">Approve</button> <button class="btn sm danger" onclick="rejectAffiliateSale('${s.id}')">Reject</button>`;
+    } else {
+      actions = `<span style="color:var(--muted); font-size:11px;">Processed</span>`;
+    }
+    html += `<tr><td>${escapeHtml(uname)}</td><td>${escapeHtml(s.productName||'—')}</td><td>${fmtMoney(s.saleAmount||0)}</td><td>${fmtMoney(s.commission||0)}</td><td>${date}</td><td>${actions}</td></tr>`;
+  });
+  body.innerHTML = html;
+}
+
+function onAffSaleProductChange(){ recalcAffSaleCommission(); }
+function recalcAffSaleCommission(){
+  const pid = document.getElementById('affSaleProduct').value;
+  const p = affiliateProductsAdminCache[pid];
+  const amount = parseFloat(document.getElementById('affSaleAmount').value) || 0;
+  if(!p) return;
+  const commission = p.commissionType === 'flat' ? (p.commissionValue||0) : (amount * (p.commissionValue||0) / 100);
+  document.getElementById('affSaleCommission').value = commission.toFixed(2);
+}
+function openAffiliateSaleModal(){
+  document.getElementById('affSaleUserEmail').value = '';
+  document.getElementById('affSaleAmount').value = '';
+  document.getElementById('affSaleCommission').value = '';
+  document.getElementById('affSaleNote').value = '';
+  document.getElementById('affSaleError').style.display = 'none';
+  populateAffSaleProductOptions();
+  onAffSaleProductChange();
+  openModal('affiliateSaleModal');
+}
+async function saveAffiliateSale(e){
+  e.preventDefault();
+  const errEl = document.getElementById('affSaleError');
+  errEl.style.display = 'none';
+  const email = document.getElementById('affSaleUserEmail').value.trim().toLowerCase();
+  const productId = document.getElementById('affSaleProduct').value;
+  const saleAmount = parseFloat(document.getElementById('affSaleAmount').value) || 0;
+  const commission = parseFloat(document.getElementById('affSaleCommission').value) || 0;
+  const note = document.getElementById('affSaleNote').value.trim();
+  const product = affiliateProductsAdminCache[productId];
+  if(!product){ errEl.textContent = 'Please select a valid product.'; errEl.style.display='block'; return false; }
+  showLoading(true);
+  try{
+    const userSnap = await db.collection('users').where('email','==',email).limit(1).get();
+    if(userSnap.empty){
+      errEl.textContent = 'No user found with that email.'; errEl.style.display='block';
+      showLoading(false);
+      return false;
+    }
+    const uid = userSnap.docs[0].id;
+    await db.collection('affiliateSales').add({
+      uid, productId, productName: product.name, saleAmount, commission, note,
+      status: 'pending', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Sale logged as pending.','success');
+    closeModal('affiliateSaleModal');
+  }catch(err){ showToast('Failed to log sale.','error'); }
+  showLoading(false);
+  return false;
+}
+async function approveAffiliateSale(id){
+  if(!confirm('Approve this sale and credit commission to the affiliate?')) return;
+  showLoading(true);
+  try{
+    const sRef = db.collection('affiliateSales').doc(id);
+    const sSnap = await sRef.get();
+    const s = sSnap.data();
+    await db.runTransaction(async (tx)=>{
+      const userRef = db.collection('users').doc(s.uid);
+      tx.update(userRef, {
+        balance: firebase.firestore.FieldValue.increment(s.commission),
+        totalEarnings: firebase.firestore.FieldValue.increment(s.commission),
+        affiliateEarnings: firebase.firestore.FieldValue.increment(s.commission)
+      });
+      tx.update(sRef, { status:'approved', processedAt: firebase.firestore.FieldValue.serverTimestamp(), processedBy: adminUser.email });
+    });
+    await addTransaction(s.uid, `Affiliate sale commission — ${s.productName}`, s.commission, 'credit');
+    await addNotification(s.uid, `🎉 You earned ${fmtMoney(s.commission)} commission on a sale of ${s.productName}!`);
+    showToast('Sale approved and commission credited.','success');
+  }catch(err){ showToast('Failed to approve sale.','error'); }
+  showLoading(false);
+}
+async function rejectAffiliateSale(id){
+  const reason = prompt('Reason for rejecting this sale (optional):');
+  if(reason === null) return;
+  showLoading(true);
+  try{
+    await db.collection('affiliateSales').doc(id).update({
+      status:'rejected', adminNote: reason || '', processedAt: firebase.firestore.FieldValue.serverTimestamp(), processedBy: adminUser.email
+    });
+    showToast('Sale rejected.','info');
+  }catch(err){ showToast('Failed to reject sale.','error'); }
   showLoading(false);
 }
 
