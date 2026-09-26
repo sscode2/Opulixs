@@ -154,6 +154,7 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
     <div class="sidebar-logo">OPUL<span>IX</span> Admin</div>
     <button class="side-link active" data-page="dashboard" onclick="goAdminPage('dashboard')"><span class="ic">📊</span>Dashboard</button>
     <button class="side-link" data-page="home-video" onclick="goAdminPage('home-video')"><span class="ic">🎬</span>Featured Video & Action</button>
+    <button class="side-link" data-page="banner-ad" onclick="goAdminPage('banner-ad')"><span class="ic">🖼️</span>Banner Ad</button>
     <button class="side-link" data-page="users" onclick="goAdminPage('users')"><span class="ic">👥</span>User Management</button>
     <button class="side-link" data-page="tasks" onclick="goAdminPage('tasks')"><span class="ic">✅</span>Task Management</button>
     <button class="side-link" data-page="withdraw" onclick="goAdminPage('withdraw')"><span class="ic">💸</span>Withdrawals</button>
@@ -240,6 +241,53 @@ input:checked + .slider-tog:before{transform:translateX(18px);}
 
             <button class="btn block" type="submit">💾 Save Homepage Video & Action</button>
           </form>
+
+        </div>
+      </div>
+
+      <!-- ================= BANNER AD ================= -->
+      <div id="admin-page-banner-ad" class="admin-page hidden">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:20px;">
+
+          <!-- Edit Form -->
+          <form class="card" onsubmit="return saveBannerAdSettings(event)">
+            <div class="section-title" style="margin-top:0;">Banner Ad Configuration</div>
+            <div style="font-size:12px; color:var(--muted); margin-bottom:14px;">
+              This banner appears fixed at the very top of the user app, right above the earning dashboard / balance cards.
+            </div>
+
+            <div class="toggle-row">
+              <span>Show Banner Ad</span>
+              <label class="switch"><input type="checkbox" id="baEnabled" checked /><span class="slider-tog"></span></label>
+            </div>
+
+            <div class="field">
+              <label>Banner Image URL</label>
+              <input type="text" id="baImageUrl" required placeholder="https://example.com/banner.jpg" oninput="updateBannerAdPreview()" />
+              <div style="font-size:11px; color:var(--muted); margin-top:4px;">A wide, short image (roughly 6:1 to 8:1) fits best as a top banner strip.</div>
+            </div>
+
+            <div class="field">
+              <label>Click-through Link (optional)</label>
+              <input type="text" id="baLinkUrl" placeholder="https://... (leave blank for a non-clickable banner)" />
+            </div>
+
+            <div class="field">
+              <label>Alt Text (optional)</label>
+              <input type="text" id="baAltText" placeholder="e.g. Special Offer" />
+            </div>
+
+            <button class="btn block" type="submit">💾 Save Banner Ad</button>
+          </form>
+
+          <!-- Live Preview -->
+          <div class="card">
+            <div class="section-title" style="margin-top:0;">Preview</div>
+            <div style="border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,.08); background:var(--card2);">
+              <img id="baPreviewImg" src="" style="width:100%; display:none;" onerror="this.style.display='none'; document.getElementById('baPreviewEmpty').style.display='block';" onload="document.getElementById('baPreviewEmpty').style.display='none'; this.style.display='block';" />
+              <div id="baPreviewEmpty" class="empty-row">No image URL set yet</div>
+            </div>
+          </div>
 
         </div>
       </div>
@@ -607,6 +655,7 @@ function detachAll(){ unsubscribers.forEach(u=>u()); unsubscribers = []; }
 const PAGE_TITLES = { 
   dashboard:'Dashboard', 
   'home-video':'Featured Video & Action Banner',
+  'banner-ad':'Banner Ad',
   users:'User Management', 
   tasks:'Task Management', 
   withdraw:'Withdrawal Management', 
@@ -632,6 +681,7 @@ let allUsersCache = {};
 function initAllListeners(){
   listenDashboardStats();
   listenFeaturedVideoSettings();
+  listenBannerAdSettings();
   listenUsersPage();
   listenTasksPage();
   listenTutorialsPage();
@@ -690,6 +740,71 @@ async function saveFeaturedVideoSettings(e){
   }catch(err){
     console.error(err);
     showToast('Failed to save featured video settings.','error');
+  }
+  showLoading(false);
+  return false;
+}
+
+/* =====================================================================================
+   BANNER AD MANAGEMENT
+   A single admin-configured image banner shown fixed at the top of the user app,
+   above the earning dashboard / balance cards. Controlled entirely by an image URL,
+   plus an optional click-through link and alt text.
+===================================================================================== */
+function listenBannerAdSettings(){
+  const unsub = db.collection('settings').doc('bannerAd').onSnapshot((doc)=>{
+    const data = doc.exists ? doc.data() : {};
+    document.getElementById('baEnabled').checked = data.enabled !== false;
+    document.getElementById('baImageUrl').value = data.imageUrl || '';
+    document.getElementById('baLinkUrl').value = data.linkUrl || '';
+    document.getElementById('baAltText').value = data.altText || '';
+    updateBannerAdPreview();
+  }, err=>console.error('banner ad settings listener error:', err));
+  unsubscribers.push(unsub);
+}
+
+function updateBannerAdPreview(){
+  const url = document.getElementById('baImageUrl').value.trim();
+  const img = document.getElementById('baPreviewImg');
+  const empty = document.getElementById('baPreviewEmpty');
+  if(!url){
+    img.style.display = 'none';
+    img.removeAttribute('src');
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  img.style.display = 'block';
+  img.src = url;
+}
+
+async function saveBannerAdSettings(e){
+  e.preventDefault();
+  const imageUrl = document.getElementById('baImageUrl').value.trim();
+  if(!/^https?:\/\//i.test(imageUrl)){
+    showToast('Please enter a valid image URL starting with http:// or https://','error');
+    return false;
+  }
+  const linkUrl = document.getElementById('baLinkUrl').value.trim();
+  if(linkUrl && !/^https?:\/\//i.test(linkUrl)){
+    showToast('The click-through link must start with http:// or https://','error');
+    return false;
+  }
+
+  showLoading(true);
+  try{
+    await db.collection('settings').doc('bannerAd').set({
+      enabled: document.getElementById('baEnabled').checked,
+      imageUrl: imageUrl,
+      linkUrl: linkUrl,
+      altText: document.getElementById('baAltText').value.trim(),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedBy: adminUser.email
+    }, { merge: true });
+    showToast('Banner ad saved successfully!','success');
+  }catch(err){
+    console.error(err);
+    showToast('Failed to save banner ad settings.','error');
   }
   showLoading(false);
   return false;
